@@ -11,6 +11,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<CategoryService>();
+
 
 var app = builder.Build();
 
