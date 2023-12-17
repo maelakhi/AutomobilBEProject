@@ -2224,11 +2224,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Data\\Bootcamp CodingId\\FinalProject\\BE\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE.csproj",
+      "projectUniqueName": "C:\\Data\\Bootcamp CodingId\\FinalProject\\BE\\be-finalprojectcodingid\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE.csproj",
       "projectName": "FinalProjectCodingIDBE",
-      "projectPath": "C:\\Data\\Bootcamp CodingId\\FinalProject\\BE\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE.csproj",
+      "projectPath": "C:\\Data\\Bootcamp CodingId\\FinalProject\\BE\\be-finalprojectcodingid\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE.csproj",
       "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-      "outputPath": "C:\\Data\\Bootcamp CodingId\\FinalProject\\BE\\FinalProjectCodingIDBE\\FinalProjectCodingIDBE\\obj\\",
+      "outputPath": "C:\\Data\\Bootcamp CodingId\\FinalProject\\BE\\be-finalprojectcodingid\\FinalProjectCodingIDBE\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
