@@ -57,6 +57,51 @@ namespace FinalProjectCodingIDBE.Repositories
             return carts;
         }
 
+        public CartResponseDTO GetByIdCart(int userId, int idCart)
+        {
+            CartResponseDTO carts = new CartResponseDTO();
+
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT c.carts_id, p.*, c.date_schedule,cg.category_name, c.id_user FROM Carts c LEFT JOIN Products p ON p.product_id = c.id_product LEFT JOIN Category cg ON p.id_category = cg.category_id WHERE c.id_user = @IdUser AND c.carts_id = @idCarts;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@idUser", userId);
+                cmd.Parameters.AddWithValue("@idCarts", idCart);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    ProductsResponseDTO product = new ProductsResponseDTO()
+                    {
+                        Id = reader.GetInt32("product_id"),
+                        Name = reader.GetString("product_name"),
+                        Description = reader.GetString("product_desc"),
+                        Price = reader.GetInt32("product_price"),
+                        CreatedAt = reader.GetString("created_at"),
+                        UpdatedAt = reader.GetString("updated_at"),
+                        IdCategory = reader.GetInt32("id_category"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        ImagePath = reader.GetString("image_path"),
+                        CategoryName = reader.GetString("category_name")
+                    };
+                    carts.Id = reader.GetInt32("carts_id");
+                    carts.IdProduct = reader.GetInt32("product_id");
+                    carts.IdUser = reader.GetInt32("id_user");
+                    carts.DateSchedule = reader.GetString("date_schedule");
+                    carts.product = product;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return carts;
+        }
+
         public string CreateCart(AddCartDTO cartData)
         {
             string response = string.Empty;

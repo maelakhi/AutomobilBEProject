@@ -17,10 +17,16 @@ namespace FinalProjectCodingIDBE.Controllers
             _cartService = serviceCart;
         }
 
-        [HttpGet("/carts/{userId}")]
+        [HttpGet("/carts")]
         public ActionResult GetAll(int userId)
         {
             return Ok(_cartService.GetCartAll(userId));
+        }
+
+        [HttpGet("/carts/{idCart}")]
+        public ActionResult GetCartById(int userId, int idCart)
+        {
+            return Ok(_cartService.GetCartById(userId, idCart));
         }
 
         [HttpPost("/carts")]
@@ -46,10 +52,5 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("SuccessFully Delete Cart");
         }
 
-     /*   [HttpDelete("/carts/{userId}/{idProduct}")]
-        public ActionResult DeleteAll(int userId, int idProduct)
-        {
-            return Ok(_cartService.CartCreate(idProduct, userId));
-        }*/
     }
 }

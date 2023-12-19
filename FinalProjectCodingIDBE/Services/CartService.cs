@@ -15,6 +15,11 @@ namespace FinalProjectCodingIDBE.Services
             return _cartRepository.GetAllCart(userId);
         }
 
+        public CartResponseDTO GetCartById(int userId, int idCart)
+        {
+            return _cartRepository.GetByIdCart(userId, idCart);
+        }
+
         public string CartCreate(AddCartDTO cartData)
         {
             return _cartRepository.CreateCart(cartData);
