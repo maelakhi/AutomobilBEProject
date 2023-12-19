@@ -10,6 +10,7 @@ namespace FinalProjectCodingIDBE.Services
         public ProductService(ProductRepository productRepository) {
             _productsRepository = productRepository;
         }
+
         public List<ProductsResponseDTO> GetAllProducts()
         {
             List<ProductsResponseDTO> products = _productsRepository.GetProductsAll();
@@ -21,20 +22,29 @@ namespace FinalProjectCodingIDBE.Services
             ProductsResponseDTO product = _productsRepository.GetProductsById(Id);
             return product;
         }
-        public Products ProductCreate(AddProductsDTO productsDTO)
+
+        public String ProductCreate(AddProductsDTO productsDTO, string imageFilePath)
         {
-            Products product = _productsRepository.CreateProduct(productsDTO);
+            String product = _productsRepository.CreateProduct(productsDTO, imageFilePath);
             return product;
         }
-        public Products ProductUpdate(int Id, AddProductsDTO productsDTO)
+
+        public string ProductUpdate(int Id, AddProductsDTO productsDTO, string imageFilePath)
         {
-            Products product = _productsRepository.UpdateProduct(Id,productsDTO);
+            string product = _productsRepository.UpdateProduct(Id,productsDTO,imageFilePath);
             return product;
         }
-        public bool ProductDelete(int Id)
+
+        public string ProductDelete(int Id)
         {
-            bool flagDelete = _productsRepository.DeleteProduct(Id);
+            string flagDelete = _productsRepository.DeleteProduct(Id);
             return flagDelete;
+        }
+
+        public string ProductUpdateStatus(int Id, bool Status)
+        {
+            string product = _productsRepository.UpdateStatusProduct(Id, Status);
+            return product;
         }
 
         /*Landing Page*/
@@ -43,6 +53,7 @@ namespace FinalProjectCodingIDBE.Services
             List<ProductsResponseDTO> products = _productsRepository.GetProductsLimit();
             return products;
         }
+
         public List<ProductsResponseDTO> GetByCategoryProducts(String categoryName)
         {
             List<ProductsResponseDTO> products = _productsRepository.GetProductsByCategory(categoryName);
