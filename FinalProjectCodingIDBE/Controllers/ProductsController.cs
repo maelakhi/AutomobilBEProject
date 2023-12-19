@@ -55,7 +55,7 @@ namespace FinalProjectCodingIDBE.Controllers
 
 
             string res = _productService.ProductCreate(addProductsDTO, fileUrlPath);
-            if (res != null)
+            if (string.IsNullOrEmpty(res) == false)
             {
                 return BadRequest(res);
             }
@@ -82,7 +82,7 @@ namespace FinalProjectCodingIDBE.Controllers
 
 
             string res = _productService.ProductUpdate(Id, addProductsDTO, fileUrlPath);
-            if (res != null)
+            if (string.IsNullOrEmpty(res) == false)
             {
                 return BadRequest(res);
             }
