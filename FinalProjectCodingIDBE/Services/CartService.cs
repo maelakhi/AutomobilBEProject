@@ -1,5 +1,4 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CartDTO;
-using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
 
 namespace FinalProjectCodingIDBE.Services
@@ -11,18 +10,18 @@ namespace FinalProjectCodingIDBE.Services
         {
             _cartRepository = cartRepository;
         }
-        public List<Cart> GetCartAll(int userId)
+        public List<CartResponseDTO> GetCartAll(int userId)
         {
             return _cartRepository.GetAllCart(userId);
         }
 
-        public CartResponseDTO GetCartById(int Id, int userId)
-        {
-            return _cartRepository.GetCartById(Id, userId);
-        }
-        public string CartCreate(Cart cartData)
+        public string CartCreate(AddCartDTO cartData)
         {
             return _cartRepository.CreateCart(cartData);
+        }
+        public string CartDelete(int idUser, int idCart)
+        {
+            return _cartRepository.DeleteCart(idUser, idCart);
         }
     }
 }

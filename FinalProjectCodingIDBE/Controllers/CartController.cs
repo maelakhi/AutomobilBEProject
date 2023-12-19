@@ -1,4 +1,5 @@
-﻿using FinalProjectCodingIDBE.Models;
+﻿using FinalProjectCodingIDBE.DTOs.CartDTO;
+using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,26 +22,31 @@ namespace FinalProjectCodingIDBE.Controllers
         {
             return Ok(_cartService.GetCartAll(userId));
         }
-/*
-        [HttpGet("/carts/{userId}/{idProduct}")]
-        public ActionResult GetAll(int userId,int  idProduct)
-        {
-            return Ok(_cartService.GetCartById(idProduct,userId));
-        }
 
         [HttpPost("/carts")]
-        public ActionResult AddToCart([FromBody] Cart cartData )
+        public ActionResult AddToCart([FromBody] AddCartDTO cartData )
         {
-            return Ok(_cartService.CartCreate(cartData));
+            string res = _cartService.CartCreate(cartData);
+            if(string.IsNullOrEmpty(res) == false)
+            {
+                return BadRequest(res);
+            }
+            return Ok("Succesfuly Add To Cart");
         }
 
-        [HttpDelete("/carts/{userId}/{idProduct}")]
-        public ActionResult DeleteById(int userId, int idProduct)
+        [HttpDelete("/carts/{userId}/{idCart}")]
+        public ActionResult DeleteById(int userId, int idCart)
         {
-            return Ok(_cartService.GetCartById(idProduct, userId));
-        }*/
-/*
-        [HttpDelete("/carts/{userId}/{idProduct}")]
+            string res = _cartService.CartDelete(userId, idCart);
+
+            if(string.IsNullOrEmpty (res) == false)
+            {
+                return BadRequest(res);
+            }
+            return Ok("SuccessFully Delete Cart");
+        }
+
+     /*   [HttpDelete("/carts/{userId}/{idProduct}")]
         public ActionResult DeleteAll(int userId, int idProduct)
         {
             return Ok(_cartService.CartCreate(idProduct, userId));

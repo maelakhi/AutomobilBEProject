@@ -1,6 +1,8 @@
-﻿namespace FinalProjectCodingIDBE.Models
+﻿using FinalProjectCodingIDBE.Models;
+
+namespace FinalProjectCodingIDBE.DTOs.OrderDTO
 {
-    public class OrderHeader
+    public class OrderResponseDTO
     {
         public int Id { get; set; }
         public int IdUser { get; set; }
@@ -8,5 +10,6 @@
         public int TotalAmount { get; set; }
         public string CreatedAt { get; set; } = string.Empty;
         public string UpdatedAt { get; set; } = string.Empty;
+        public List<OrderDetails>? OrderDetails { get; set; }
     }
 }

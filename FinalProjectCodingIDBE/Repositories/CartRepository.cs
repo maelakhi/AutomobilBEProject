@@ -13,24 +13,39 @@ namespace FinalProjectCodingIDBE.Repositories
             _connectionString = configuration.GetConnectionString("Default");
         }
 
-        public List<Cart> GetAllCart(int userId) { 
-            List<Cart> carts = new List<Cart>();
+        public List<CartResponseDTO> GetAllCart(int userId) { 
+            List<CartResponseDTO> carts = new List<CartResponseDTO>();
 
             MySqlConnection conn = new MySqlConnection(_connectionString);
             try
             {
                 conn.Open();
 
-                string sql = "SELECT c.carts_id, p.*, c.id_user FROM Carts c LEFT JOIN Products p ON p.product_id = c.id_product WHERE c.id_user = @IdUser;";
+                string sql = "SELECT c.carts_id, p.*, c.date_schedule,cg.category_name, c.id_user FROM Carts c LEFT JOIN Products p ON p.product_id = c.id_product LEFT JOIN Category cg ON p.id_category = cg.category_id WHERE c.id_user = @IdUser;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@idUser", userId);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read()) {
-                    carts.Add(new Cart{
+                    ProductsResponseDTO product = new ProductsResponseDTO() {
+                        Id = reader.GetInt32("product_id"),
+                        Name = reader.GetString("product_name"),
+                        Description = reader.GetString("product_desc"),
+                        Price = reader.GetInt32("product_price"),
+                        CreatedAt = reader.GetString("created_at"),
+                        UpdatedAt = reader.GetString("updated_at"),
+                        IdCategory = reader.GetInt32("id_category"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        ImagePath = reader.GetString("image_path"),
+                        CategoryName = reader.GetString("category_name")
+                    }; 
+                    carts.Add(new CartResponseDTO
+                    {
                         Id = reader.GetInt32("carts_id"),
                         IdProduct = reader.GetInt32("product_id"),
-                        IdUser = reader.GetInt32("id_user")
+                        IdUser = reader.GetInt32("id_user"),
+                        DateSchedule = reader.GetString("date_schedule"),
+                        product = product
                     });
                 }
 
@@ -42,38 +57,7 @@ namespace FinalProjectCodingIDBE.Repositories
             return carts;
         }
 
-        public CartResponseDTO GetCartById(int Id, int userId)
-        {
-            CartResponseDTO cart = new CartResponseDTO();
-            MySqlConnection conn = new MySqlConnection(_connectionString);
-            try
-            {
-                conn.Open();
-
-                string sql = "SELECT c.carts_id, p.*, c.id_user FROm Carts c LEFT JOIN Products p ON p.product_id = c.id_product WHERE c.id_user = @idUser AND c.carts_id = @idProduct;";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@idUser", userId);
-                cmd.Parameters.AddWithValue("@idProduct", Id);
-                MySqlDataReader reader = cmd.ExecuteReader();
-
-
-                while (reader.Read())
-                {
-                    cart.Id = reader.GetInt32("carts_id");
-                    cart.product.Id = reader.GetInt32("product_id");
-                    cart.IdUser = reader.GetInt32("id_user");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            conn.Close();
-            return cart;
-        }
-
-        public string CreateCart(Cart Cart)
+        public string CreateCart(AddCartDTO cartData)
         {
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -83,18 +67,38 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "INSERT INTO Products (product_id,product_name,product_desc,product_price,image_path,created_at,updated_at,id_category,is_active, is_delete) VALUES (@productId,@productName,@productDesc,@productPrice,@imagePath,@createdAt,@updatedAt,@isActive,@idCategory,@isDelete)";
+                string sql = "INSERT INTO Carts (carts_id,id_product,id_user, date_schedule) VALUES (@cartsId,@productId,@idUser,@dateShcedule)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@productId", null);
-                cmd.Parameters.AddWithValue("@productName", null);
-                cmd.Parameters.AddWithValue("@productDesc", null);
-                cmd.Parameters.AddWithValue("@productPrice", null);
-                cmd.Parameters.AddWithValue("@createdAt", now);
-                cmd.Parameters.AddWithValue("@updatedAt", now);
-                cmd.Parameters.AddWithValue("@imagePath", null);
-                cmd.Parameters.AddWithValue("@isActive", true);
-                cmd.Parameters.AddWithValue("@isDelete", false);
-                cmd.Parameters.AddWithValue("@idCategory", null);
+                cmd.Parameters.AddWithValue("@cartsId", null);
+                cmd.Parameters.AddWithValue("@productId", cartData.IdProduct);
+                cmd.Parameters.AddWithValue("@idUser", cartData.IdUser);
+                cmd.Parameters.AddWithValue("@dateShcedule", cartData.DateSchedule);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
+        public string DeleteCart(int userId, int idCart)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            DateTime now = DateTime.Now;
+
+            try
+            {
+                conn.Open();
+
+                string sql = "DELETE FROM Carts WHERE id_user=@idUser AND carts_id IN (@idCart)";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@idCart", idCart);
+                cmd.Parameters.AddWithValue("@idUser", userId);
                 cmd.ExecuteNonQuery();
             }
             catch (Exception ex)

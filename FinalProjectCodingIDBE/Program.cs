@@ -28,6 +28,8 @@ builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<CartRepository>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<OrderService>();
 
 
 var app = builder.Build();
