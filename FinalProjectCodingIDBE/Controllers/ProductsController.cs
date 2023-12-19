@@ -10,9 +10,11 @@ namespace FinalProjectCodingIDBE.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly ProductService _productService;
-        public ProductsController(ProductService serviceProducts)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductsController(ProductService serviceProducts, IWebHostEnvironment webHostEnvironment)
         {
             _productService = serviceProducts;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("/products")]
@@ -34,19 +36,91 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpPost("/products")]
-        public ActionResult CreateProduct([FromBody] AddProductsDTO addProductsDTO)
+        public async Task<ActionResult> CreateProduct([FromForm] AddProductsDTO addProductsDTO)
         {
-            return Ok(_productService.ProductCreate(addProductsDTO));
+            IFormFile image = addProductsDTO.Image!;
+
+            var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
+
+            string fileName = Guid.NewGuid().ToString() + extName;
+            string uploadDir = "uploads";
+            string physicalPath = $"wwwroot/{uploadDir}";
+
+            var filePath =Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
+
+            using var stream = System.IO.File.OpenWrite(filePath);
+            await image.CopyToAsync(stream);
+
+            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+
+
+            string res = _productService.ProductCreate(addProductsDTO, fileUrlPath);
+            if (res != null)
+            {
+                return BadRequest(res);
+            }
+            return Ok("Success Add Product");
         }
         [HttpPut("/products")]
-        public ActionResult UpdatedProduct(int Id, [FromBody] AddProductsDTO addProductsDTO)
+
+        public async Task<ActionResult> UpdatedProduct(int Id, [FromForm] AddProductsDTO addProductsDTO)
         {
-            return Ok(_productService.ProductUpdate(Id,addProductsDTO));
+            IFormFile image = addProductsDTO.Image!;
+
+            var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
+
+            string fileName = Guid.NewGuid().ToString() + extName;
+            string uploadDir = "uploads";
+            string physicalPath = $"wwwroot/{uploadDir}";
+
+            var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
+
+            using var stream = System.IO.File.OpenWrite(filePath);
+            await image.CopyToAsync(stream);
+
+            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+
+
+            string res = _productService.ProductUpdate(Id, addProductsDTO, fileUrlPath);
+            if (res != null)
+            {
+                return BadRequest(res);
+            }
+            return Ok("Success Update Product");
         }
+
+        [HttpPut("/products/Deactived")]
+        public ActionResult DeactivedProduct(int Id)
+        {
+            string res = _productService.ProductUpdateStatus(Id, false);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return BadRequest(res);
+            }
+            return Ok("SuccessFull Deactived");
+        }
+
+        [HttpPut("/products/Actived")]
+        public ActionResult ActivedProduct(int Id)
+        {
+            string res = _productService.ProductUpdateStatus(Id, true);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return BadRequest(res == null) ;
+            }
+            return Ok("SuccessFull Deactived");
+        }
+
+
         [HttpDelete("/products/{Id}")]
         public ActionResult DeleteProduct(int Id)
         {
-            return Ok(_productService.ProductDelete(Id));
+            string res = _productService.ProductDelete(Id);
+            if(res != null)
+            {
+                return BadRequest(res);
+            }
+            return Ok("SuccessFull Delete");
         }
 
         [HttpGet("/productsByCategory/{categoryName}")]

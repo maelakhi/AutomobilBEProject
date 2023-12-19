@@ -1,6 +1,7 @@
 ﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 using System.Reflection.PortableExecutable;
 
 namespace FinalProjectCodingIDBE.Repositories
@@ -20,7 +21,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id;";
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -35,8 +36,10 @@ namespace FinalProjectCodingIDBE.Repositories
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        ImagePath = reader.GetString("image_path"),
                         CategoryName = reader.GetString("category_name")
-                    });
+                    }) ;
                 }
             }
             catch (Exception ex)
@@ -56,13 +59,14 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = $"SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.product_id = {Id};";
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.product_id = @idProduct AND p.is_delete = false;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@idProduct", Id);
                 MySqlDataReader reader = cmd.ExecuteReader();
+
 
                 while (reader.Read())
                 {
-
                     product.Id = reader.GetInt32("product_id");
                     product.Name = reader.GetString("product_name");
                     product.Description = reader.GetString("product_desc");
@@ -70,11 +74,13 @@ namespace FinalProjectCodingIDBE.Repositories
                     product.CreatedAt = reader.GetString("created_at");
                     product.UpdatedAt = reader.GetString("updated_at");
                     product.IdCategory = reader.GetInt32("id_category");
+                    product.ImagePath = reader.GetString("image_path");
+                    product.IsActive = reader.GetBoolean("is_active");
                     product.CategoryName = reader.GetString("category_name");
                 }
             }
             catch (Exception ex)
-            {
+            {   
                 Console.WriteLine(ex.ToString());
             }
 
@@ -82,16 +88,17 @@ namespace FinalProjectCodingIDBE.Repositories
             return product;
         }
 
-        public Products CreateProduct(AddProductsDTO productsDTO)
+        public string CreateProduct(AddProductsDTO productsDTO, string imageFilePath)
         {
-            Products product = new Products();
+            string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
             DateTime now = DateTime.Now;
+            
             try
             {
                 conn.Open();
 
-                string sql = "INSERT INTO Products (product_id, product_name, product_desc,product_price,created_at,updated_at,id_category) VALUES (@productId, @productName, @productDesc, @productPrice, @createdAt, @updatedAt,@idCategory )";
+                string sql = "INSERT INTO Products (product_id,product_name,product_desc,product_price,image_path,created_at,updated_at,id_category,is_active, is_delete) VALUES (@productId,@productName,@productDesc,@productPrice,@imagePath,@createdAt,@updatedAt,@isActive,@idCategory,@isDelete)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@productId", null);
                 cmd.Parameters.AddWithValue("@productName", productsDTO.Name);
@@ -99,41 +106,44 @@ namespace FinalProjectCodingIDBE.Repositories
                 cmd.Parameters.AddWithValue("@productPrice", productsDTO.Price);
                 cmd.Parameters.AddWithValue("@createdAt", now);
                 cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@imagePath", imageFilePath);
+                cmd.Parameters.AddWithValue("@isActive", true);
+                cmd.Parameters.AddWithValue("@isDelete", false);
                 cmd.Parameters.AddWithValue("@idCategory", productsDTO.IdCategory);
                 cmd.ExecuteNonQuery();
-                product.Id = (int)cmd.LastInsertedId;
-                product.Name = productsDTO.Name;
-                product.Description = productsDTO.Description;
-                product.Price = productsDTO.Price;
-                product.CreatedAt = now.ToString();
-                product.UpdatedAt = now.ToString();
-                product.IdCategory = productsDTO.IdCategory;
             }
             catch (Exception ex)
             {
+                response = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
             conn.Close();
-            return product;
+            return response;
         }
-        public Products UpdateProduct(int Id,AddProductsDTO productsDTO)
+        public string UpdateProduct(int Id,AddProductsDTO productsDTO, string imageFilePath)
         {
+            string response = string.Empty;
             Products product = new Products();
             MySqlConnection conn = new MySqlConnection(_connectionString);
             DateTime now = DateTime.Now;
             ProductsResponseDTO productsDTOResponse = GetProductsById(Id);
+            if (productsDTOResponse.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
  
             try
             {
                 conn.Open();
-                string sql = "UPDATE Products SET product_name=@productName, product_desc=@productDesc, product_price=@productPrice, updated_at=@updatedAt, id_category=@idCategory WHERE product_id = @Id";
+                string sql = "UPDATE Products SET product_name=@productName, product_desc=@productDesc, product_price=@productPrice, updated_at=@updatedAt, id_category=@idCategory, image_path=@imagePath WHERE product_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@productName", productsDTO.Name);
                 cmd.Parameters.AddWithValue("@productDesc", productsDTO.Description);
                 cmd.Parameters.AddWithValue("@productPrice", productsDTO.Price);
                 cmd.Parameters.AddWithValue("@idCategory", productsDTO.IdCategory);
                 cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@imagePath", imageFilePath);
                 cmd.Parameters.AddWithValue("@Id", Id);
                 int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -142,47 +152,90 @@ namespace FinalProjectCodingIDBE.Repositories
                     //fail
                     throw new Exception("Failed to Update");
                 }
-                product.Id = productsDTOResponse.Id;
+/*                product.Id = productsDTOResponse.Id;
                 product.Name = productsDTO.Name;
                 product.Description = productsDTO.Description;
                 product.Price = productsDTO.Price;
                 product.CreatedAt = now.ToString();
                 product.UpdatedAt = now.ToString();
-                product.IdCategory = productsDTO.IdCategory;
+                product.IdCategory = productsDTO.IdCategory;*/
             }
             catch (Exception ex)
             {
+                response = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
             conn.Close();
-            return product;
+            return response;
         }
-        public bool DeleteProduct(int Id)
+        public string DeleteProduct(int Id)
         {
+            string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
             ProductsResponseDTO productsDTOResponse = GetProductsById(Id);
 
-            if(productsDTOResponse == null) {
-                return false;
+            if(productsDTOResponse.Id == 0) {
+                return "Data tidak ditemukan";
             }
 
             try
             {
                 conn.Open();
-                string sql = "DELETE FROM Products WHERE product_id = @Id";
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE Products SET is_delete=@isDelete WHERE product_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isDelete", true);
                 cmd.Parameters.AddWithValue("@Id", Id);
-                return cmd.ExecuteNonQuery() > 0;
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1){
+                    response = "Updated Failed";
+                };
             }
             catch (Exception ex)
             {
+                response = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
             conn.Close();
-            return true;
+            return response;
         }
+        public string UpdateStatusProduct(int Id,bool Status)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            ProductsResponseDTO productsDTOResponse = GetProductsById(Id);
+            
+            if (productsDTOResponse.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE Products SET is_active=@isActive WHERE product_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isActive", Status);
+                cmd.Parameters.AddWithValue("@Id", Id);
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
+                {
+                    return "Updated Failed";
+                };
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
 
 
         /*Landing page*/
@@ -194,7 +247,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id LIMIT 8;";
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false LIMIT 8;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -209,6 +262,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
+                        ImagePath = reader.GetString("image_path"),
+                        IsActive = reader.GetBoolean("is_active"),
                         CategoryName = reader.GetString("category_name")
                     });
                 }
@@ -229,7 +284,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = $"SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.id_category IN (select cc.category_id from Category cc where cc.category_name = @categoryName);";
+                string sql = $"SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.id_category IN (select cc.category_id from Category cc where cc.category_name = @categoryName) AND p.is_delete = false ;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@categoryName", category);
                 MySqlDataReader reader = cmd.ExecuteReader();
@@ -245,6 +300,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
+                        ImagePath = reader.GetString("image_path"),
+                        IsActive = reader.GetBoolean("is_active"),
                         CategoryName = reader.GetString("category_name")
                     });
                     
