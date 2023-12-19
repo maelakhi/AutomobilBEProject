@@ -1,0 +1,120 @@
+Create Database BEFINALPROJECT;
+DROP DATABASE BEFINALPROJECT;
+
+DROP table category ;
+CREATE TABLE Category (
+	category_id INT(11) NOT NULL AUTO_INCREMENT,
+	category_name VARCHAR(255) NOT null UNIQUE,
+	category_desc VARCHAR(255),
+	created_at DATE,
+	updated_at DATE,
+	PRIMARY KEY(category_id)
+);
+CREATE TABLE Products (
+	product_id int(11) NOT NULL AUTO_INCREMENT,
+	product_name Varchar(255) NOT NULL,
+	product_desc Varchar(255),
+	product_price int(11), 
+	created_at Date,
+	updated_at Date,
+	id_category int(11) NOT NULL,
+	PRIMARY KEY(product_id),
+	FOreign KEY(id_category) REFERENCES Category(category_id)
+);
+CREATE TABLE Users (
+	user_id int(11) NOT NULL AUTO_INCREMENT,
+	user_email Varchar(255) NOT null UNIQUE,
+	user_password Varchar(255),
+	created_at Date,
+	updated_at Date,
+	PRIMARY KEY(user_id)
+);
+create table carts (
+	carts_id int(11) not null auto_increment,
+	id_product int(11) not null,
+	id_user int(11) not null,
+	created_at Date,
+	updated_at Date,
+	PRIMARY KEY(carts_id),
+	foreign key(id_product) references Products(product_id),
+	foreign key(id_user) references Users(user_id)
+);
+create table Payment_method (
+	payment_id int(11) not null auto_increment,
+	payment_name int(11) not null,
+	payment_number_account int(50) not null,
+	created_at Date,
+	updated_at Date,
+	PRIMARY KEY(payment_id)
+);
+create table order_header (
+	order_id int(11) not null auto_increment,
+	id_user int(11) not null,
+	id_payment int(11) not null,
+	status varchar(25),
+	created_at Date,
+	updated_at Date,
+	PRIMARY KEY(order_id),
+	foreign key(id_payment) references Payment_method(payment_id),
+	foreign key(id_user) references Users(user_id)
+);
+create table order_details (
+	order_detail_id int(11) not null auto_increment,
+	id_order int(11) not null,
+	id_product int(11) not null,
+	quantity int(11)not null,
+	amount_product int(11) not null,
+	total_amount int(11),
+	created_at Date,
+	updated_at Date,
+	PRIMARY KEY(order_detail_id),
+	foreign key(id_order) references order_header(order_id),
+	foreign key(id_product) references Products(product_id)
+);
+create table invoices (
+	invoice_id int(11) not null auto_increment,
+	id_order int(11) not null,
+	status varchar(25),
+	created_at Date,
+	updated_at Date,
+	PRIMARY KEY(invoice_id),
+	foreign key(id_order) references order_header(order_id)
+);
+
+INSERT INTO Category VALUES
+(DEFAULT, "Electric", "This car is Electric", now(), NOW()),
+(DEFAULT, "Hatchback", "This car is Hatchback", NOW(), NOW()),
+(DEFAULT, "LCGC", "This car is LCGC", NOW(), NOW()),
+(DEFAULT, "MPV", "This car is MPV", NOW(), NOW()),
+(DEFAULT, "Offroad", "This car is Offroad", NOW(), NOW()),
+(DEFAULT, "Sedan", "This car is Sedan", NOW(), NOW()),
+(DEFAULT, "SUV", "This car is SUV", NOW(), NOW()),
+(DEFAULT, "Truck", "This car is Truck", NOW(), NOW());
+
+INSERT INTO Products VALUES
+(DEFAULT, "Course SUV Kijang Innova", "This Car type SUV, and name is Kijang Innova", 700000, NOW(),NOW(), 1),
+(DEFAULT, "Course LCGC Honda Brio", "This Car type LCGC, and name is Honda Brio", 500000, NOW(),NOW(), 3),
+(DEFAULT, "Course Hyundai Palisade 2021", "This Car type SUV, and name is Hyundai Palisade 2021", 800000, NOW(), NOW(), 1),
+(DEFAULT, "Course Mitsubishi Pajero", "This Car type SUV, and name is Mitsubishi Pajero", 800000, NOW(),NOW(), 1),
+(DEFAULT, "Course Dump Truck for Mining Constructor", "This Car type Truck, and name is Dump Truck for Mining Constructor", 1200000, NOW(),NOW(), 8),
+(DEFAULT, "Course LCGC Honda Calya", "This Car type LCGC, and name is Honda Calya", 400000, NOW(),NOW(), 6),
+(DEFAULT, "Course LCGC Honda Ertiga", "This Car type LCGC, and name is Honda Ertiga", 400000, NOW(),NOW(), 6);
+
+#query GET product
+SELECT 
+ p.*,c.category_name
+FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id;
+
+#query GET product by id
+SELECT 
+ p.*,c.category_name
+FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id
+WHERE p.product_id = 1;
+
+#query get product car limit 8
+SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id LIMIT 8;
+
+#query get product car by type car
+SELECT p.*,c.category_name FROM Products p 
+LEFT JOIN Category c ON p.id_category = c.category_id
+WHERE p.id_category IN (select cc.category_id from Category cc where cc.category_name = 'LCGC');
