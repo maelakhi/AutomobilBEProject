@@ -1,6 +1,8 @@
 using FinalProjectCodingIDBE.Repositories;
 using FinalProjectCodingIDBE.Services;
 
+string myCORSKey = "courseCORSKey";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,8 +11,28 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myCORSKey,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5173");
+                      });
+});
+
+
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<CartRepository>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<InvoiceRepository>();
+builder.Services.AddScoped<InvoiceService>();
+
 
 var app = builder.Build();
 
@@ -20,6 +42,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(myCORSKey);
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
