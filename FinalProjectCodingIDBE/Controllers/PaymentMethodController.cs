@@ -27,5 +27,17 @@ namespace FinalProjectCodingIDBE.Controllers
             }
             return Ok(paymentList);
         }
+
+        [Authorize]
+        [HttpGet("/paymentMethod/{id}")]
+        public IActionResult GetPaymnetById(int Id)
+        {
+            PaymentMethod payment = _paymentService.GetPaymentMethodById(Id);
+            if (payment.Id == 0 )
+            {
+                return NotFound("Data Tidak di temukan");
+            }
+            return Ok(payment);
+        }
     }
 }

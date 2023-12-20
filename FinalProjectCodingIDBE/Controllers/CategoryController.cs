@@ -19,14 +19,12 @@ namespace FinalProjectCodingIDBE.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        [Authorize]
         [HttpGet("/Category")]
         public ActionResult GetAll()
         {
             return Ok(_CategoryService.GetCategories());
         }
 
-        [Authorize(Roles = "admin")]
         [HttpGet("/category/{Id}")]
         public ActionResult GetById(int Id)
         {
