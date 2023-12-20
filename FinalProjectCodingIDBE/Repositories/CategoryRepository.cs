@@ -75,42 +75,48 @@ namespace FinalProjectCodingIDBE.Repositories
             return category;
         }
 
-        public Category CreateCategory(AddCategoryDTO categoryDTO)
+        public string CreateCategory(AddCategoryDTO categoryDTO)
         {
-            Category category = new Category();
+            string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
             DateTime now = DateTime.Now;
+
             try
             {
                 conn.Open();
 
-                string sql = "INSERT INTO category (category_id, category_name, category_desc, created_at, updated_at) VALUES (@categoryID, @categoryName, @categoryDesc, @createdAt, @updatedAt )";
+                string sql = "INSERT INTO category (category_id, category_name, category_desc, created_at, updated_at, is_active, is_delete) VALUES (@categoryID, @categoryName, @categoryDesc, @createdAt, @updatedAt, @isActive, @isDeleted )";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@categoryID", null);
-                cmd.Parameters.AddWithValue("@categoryName", category.Name);
-                cmd.Parameters.AddWithValue("@categoryDesc", category.Description);
+                cmd.Parameters.AddWithValue("@categoryName", categoryDTO.Name);
+                cmd.Parameters.AddWithValue("@categoryDesc", categoryDTO.Description);
                 cmd.Parameters.AddWithValue("@createdAt", now);
                 cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isActive", true);
+                cmd.Parameters.AddWithValue("@isDeleted", false);
                 cmd.ExecuteNonQuery();
-                category.Id = (int)cmd.LastInsertedId;
-                category.Name = categoryDTO.Name;
-                category.Description = categoryDTO.Description;
-                category.CreatedAt = now.ToString();
-                category.UpdatedAt = now.ToString();
             }
             catch (Exception ex)
             {
+                response = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
             conn.Close();
-            return category;
+            return response;
         }
-        public Category UpdateCategory(int Id, AddCategoryDTO categoryDTO)
+        public string UpdateCategory(int Id, AddCategoryDTO categoryDTO)
         {
+            string response = string.Empty;
             Category category = GetCategoryById(Id);
             MySqlConnection conn = new MySqlConnection(_connectionString);
             DateTime now = DateTime.Now;
+
+            Category categoryResponse = GetCategoryById(Id);
+            if (categoryResponse.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
 
             try
             {
@@ -128,81 +134,48 @@ namespace FinalProjectCodingIDBE.Repositories
                     //fail
                     throw new Exception("Failed to Update");
                 }
-                category.Id = (int)cmd.LastInsertedId;
-                category.Name = categoryDTO.Name;
-                category.Description = categoryDTO.Description;
-                category.CreatedAt = now.ToString();
-                category.UpdatedAt = now.ToString();
             }
             catch (Exception ex)
             {
+                response = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
             conn.Close();
-            return category;
+            return response;
         }
-        public bool DeleteCategory(int Id)
+        public string DeleteCategory(int Id)
         {
+            string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
             Category category = GetCategoryById(Id);
 
-            if (category == null)
+            if (category.Id == 0)
             {
-                return false;
+                return "Data tidak ditemukan";
             }
 
             try
             {
                 conn.Open();
-                string sql = "DELETE FROM Category WHERE category_id = @Id";
+                string sql = "UPDATE Category SET is_delete=@isDelete WHERE category_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isDelete", true);
                 cmd.Parameters.AddWithValue("@Id", Id);
-                return cmd.ExecuteNonQuery() > 0;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            conn.Close();
-            return true;
-        }
-
-
-        /*Landing page*/
-        public List<Category> GetCategoryLimit()
-        {
-            List<Category> categories = new List<Category>();
-            MySqlConnection conn = new MySqlConnection(_connectionString);
-            try
-            {
-                conn.Open();
-
-                string sql = "SELECT * FROM Category LIMIT 6;";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                MySqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
                 {
-                    categories.Add(new Category()
-                    {
-                        Id = reader.GetInt32("category_id"),
-                        Name = reader.GetString("category_name"),
-                        Description = reader.GetString("category_desc"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
-                    });
-                }
+                    response = "Updated Failed";
+                };
             }
             catch (Exception ex)
             {
+                response = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
             conn.Close();
-            return categories;
+            return response;
         }
-
     }
 }
