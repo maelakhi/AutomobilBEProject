@@ -127,5 +127,11 @@ namespace FinalProjectCodingIDBE.Controllers
         {
             return Ok(_productService.GetByCategoryProducts(categoryName));
         }
+
+        [HttpGet("/productsByCategoryId/{Id}")]
+         public ActionResult GetByCategoryId(int Id)
+         {
+            return Ok(_productService.GetByCategoryProductsId(Id));
+         }
     }
 }

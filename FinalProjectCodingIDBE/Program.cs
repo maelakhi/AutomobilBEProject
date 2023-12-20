@@ -58,8 +58,9 @@ builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<InvoiceRepository>();
 builder.Services.AddScoped<InvoiceService>();
+builder.Services.AddScoped<PaymentMethodService>();
+builder.Services.AddScoped<PaymentMethodRepository>();
 builder.Services.AddScoped<UserRepository>();
-
 
 //add auth
 builder.Services.AddAuthorization();

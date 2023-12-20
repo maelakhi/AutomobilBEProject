@@ -1,6 +1,7 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CategoryDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace FinalProjectCodingIDBE.Repositories
 {
@@ -19,12 +20,13 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT * FROM Category;";
+                string sql = "SELECT * FROM Category WHERE is_delete = false;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
                     category.Add(new Category()
                     {
                         Id = reader.GetInt32("category_id"),
@@ -32,6 +34,7 @@ namespace FinalProjectCodingIDBE.Repositories
                         Description = reader.GetString("category_desc"),
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
+                        ImagePath = image
                     });
                 }
             }
@@ -58,12 +61,13 @@ namespace FinalProjectCodingIDBE.Repositories
 
                 while (reader.Read())
                 {
-
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
                     category.Id = reader.GetInt32("category_id");
                     category.Name = reader.GetString("category_name");
                     category.Description = reader.GetString("category_desc");
                     category.CreatedAt = reader.GetString("created_at");
                     category.UpdatedAt = reader.GetString("updated_at");
+                    category.ImagePath = image;
                 }
             }
             catch (Exception ex)
@@ -75,7 +79,7 @@ namespace FinalProjectCodingIDBE.Repositories
             return category;
         }
 
-        public string CreateCategory(AddCategoryDTO categoryDTO)
+        public string CreateCategory(AddCategoryDTO categoryDTO, string fileUrlPath)
         {
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -85,7 +89,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "INSERT INTO category (category_id, category_name, category_desc, created_at, updated_at, is_active, is_delete) VALUES (@categoryID, @categoryName, @categoryDesc, @createdAt, @updatedAt, @isActive, @isDeleted )";
+                string sql = "INSERT INTO category (category_id, category_name, category_desc, created_at, updated_at, is_active, is_delete, image_path) VALUES (@categoryID, @categoryName, @categoryDesc, @createdAt, @updatedAt, @isActive, @isDeleted, @imagePath)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@categoryID", null);
                 cmd.Parameters.AddWithValue("@categoryName", categoryDTO.Name);
@@ -94,6 +98,7 @@ namespace FinalProjectCodingIDBE.Repositories
                 cmd.Parameters.AddWithValue("@updatedAt", now);
                 cmd.Parameters.AddWithValue("@isActive", true);
                 cmd.Parameters.AddWithValue("@isDeleted", false);
+                cmd.Parameters.AddWithValue("@imagePath", fileUrlPath);
                 cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -105,7 +110,7 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
-        public string UpdateCategory(int Id, AddCategoryDTO categoryDTO)
+        public string UpdateCategory(int Id, AddCategoryDTO categoryDTO, string fileUrlPath)
         {
             string response = string.Empty;
             Category category = GetCategoryById(Id);
@@ -121,12 +126,13 @@ namespace FinalProjectCodingIDBE.Repositories
             try
             {
                 conn.Open();
-                string sql = "UPDATE Category SET category_name=@categoryName, category_desc=@categoryDesc, updated_at=@updatedAt WHERE category_id = @Id";
+                string sql = "UPDATE Category SET category_name=@categoryName, category_desc=@categoryDesc, image_path=@imagePath,updated_at=@updatedAt WHERE category_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@categoryName", category.Name);
                 cmd.Parameters.AddWithValue("@categoryDesc", category.Description);
                 cmd.Parameters.AddWithValue("@updatedAt", now);
                 cmd.Parameters.AddWithValue("@Id", Id);
+                cmd.Parameters.AddWithValue("@imagePath", fileUrlPath);
                 int rowsAffected = cmd.ExecuteNonQuery();
 
                 if (rowsAffected < 1)

@@ -23,14 +23,14 @@ namespace FinalProjectCodingIDBE.Services
             Category category = _CategorysRepository.GetCategoryById(Id);
             return category;
         }
-        public string CategoryCreate(AddCategoryDTO categorysDTO)
+        public string CategoryCreate(AddCategoryDTO categorysDTO, string fileUrlPath)
         {
-            string category = _CategorysRepository.CreateCategory(categorysDTO);
+            string category = _CategorysRepository.CreateCategory(categorysDTO, fileUrlPath);
             return category;
         }
-        public string CategoryUpdate(int Id, AddCategoryDTO categorysDTO)
+        public string CategoryUpdate(int Id, AddCategoryDTO categorysDTO, string fileUrlPath)
         {
-            string category = _CategorysRepository.UpdateCategory(Id, categorysDTO);
+            string category = _CategorysRepository.UpdateCategory(Id, categorysDTO, fileUrlPath);
             return category;
         }
         public string CategoryDelete(int Id)
