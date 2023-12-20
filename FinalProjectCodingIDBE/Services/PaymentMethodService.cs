@@ -14,7 +14,12 @@ namespace FinalProjectCodingIDBE.Services
 
         public List<PaymentMethod> GetPaymentMethodAll()
         {
-            return _paymentMethodRepository.PaymentList();
+            return _paymentMethodRepository.GetPaymentList();
+        }
+
+        public PaymentMethod GetPaymentMethodById(int Id)
+        {
+            return _paymentMethodRepository.GetPaymentById(Id);
         }
     }
 }

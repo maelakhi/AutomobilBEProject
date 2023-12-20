@@ -43,7 +43,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: myCORSKey,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:5173");
+                          policy.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader();
                       });
 });
 
@@ -61,6 +61,7 @@ builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<PaymentMethodService>();
 builder.Services.AddScoped<PaymentMethodRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserService>();
 
 //add auth
 builder.Services.AddAuthorization();

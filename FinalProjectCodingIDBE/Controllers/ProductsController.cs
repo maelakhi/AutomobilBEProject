@@ -29,7 +29,6 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(_productService.GetLimitProducts());
         }
 
-        [Authorize]
         [HttpGet("/products/{Id}")]
         public ActionResult GetById(int Id)
         {
