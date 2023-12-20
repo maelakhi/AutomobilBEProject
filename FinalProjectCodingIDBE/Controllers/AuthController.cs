@@ -19,11 +19,11 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpPost("/Login")]
-        public ActionResult Login([FromBody] LoginDto data)
+        public ActionResult Login([FromForm] LoginDto data)
         {
             string hashedPassword = PasswordHelper.HashPassword(data.Password);
 
-            Users? user = _userRepository.GetByEmailAndPassword(data.Email, data.Password);
+            Users? user = _userRepository.GetByEmailAndPassword(data.Email, hashedPassword);
 
             if (user == null)
             {
@@ -35,5 +35,21 @@ namespace FinalProjectCodingIDBE.Controllers
 
             return Ok(token);
         }
+
+        [HttpPost("/Register")]
+        public ActionResult Register([FromForm] RegisterDto data)
+        {
+            string hashedPassword = PasswordHelper.HashPassword(data.Password);
+
+            string res = _userRepository.CreateAccount(data.Email, hashedPassword);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                return BadRequest(res);
+            }
+
+            return Ok("Create Account Successfull!");
+        }
+
     }
 }
