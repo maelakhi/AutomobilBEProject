@@ -1,5 +1,6 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CategoryDTO;
 using FinalProjectCodingIDBE.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,18 +16,21 @@ namespace FinalProjectCodingIDBE.Controllers
             _CategoryService = serviceCategorys;
         }
 
+        [Authorize]
         [HttpGet("/Category")]
         public ActionResult GetAll()
         {
             return Ok(_CategoryService.GetCategories());
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("/category/{Id}")]
         public ActionResult GetById(int Id)
         {
             return Ok(_CategoryService.GetByIdCategory(Id));
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost("/category")]
         public ActionResult CreateCategory([FromForm] AddCategoryDTO addCategoryDTO)
         {
@@ -38,6 +42,8 @@ namespace FinalProjectCodingIDBE.Controllers
             }
             return Ok("Success Add Category");
         }
+
+        [Authorize(Roles = "admin")]
         [HttpPut("/category")]
         public ActionResult UpdatedCategory(int Id, [FromForm] AddCategoryDTO addCategoryDTO)
         {
@@ -48,6 +54,8 @@ namespace FinalProjectCodingIDBE.Controllers
             }
             return Ok("Success Update Category");
         }
+
+        [Authorize(Roles = "admin")]
         [HttpDelete("/category/{Id}")]
         public ActionResult DeleteCategory(int Id)
         {
