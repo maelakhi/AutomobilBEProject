@@ -10,20 +10,15 @@ namespace FinalProjectCodingIDBE.Controllers
     public class CategorysController : ControllerBase
     {
         private readonly CategoryService _CategoryService;
-        public CategorysController(CategoryService serviceCategorys) { 
+        public CategorysController(CategoryService serviceCategorys)
+        {
             _CategoryService = serviceCategorys;
         }
 
-        [HttpGet("/Category")]   
+        [HttpGet("/Category")]
         public ActionResult GetAll()
         {
             return Ok(_CategoryService.GetCategories());
-        }
-
-        [HttpGet("/categoryLimit")]
-        public ActionResult GetLimit()
-        {
-            return Ok(_CategoryService.GetLimitCategory());
         }
 
         [HttpGet("/category/{Id}")]
@@ -33,20 +28,35 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpPost("/category")]
-        public ActionResult CreateCategory([FromBody] AddCategoryDTO addCategoryDTO)
+        public ActionResult CreateCategory([FromForm] AddCategoryDTO addCategoryDTO)
         {
-            return Ok(_CategoryService.CategoryCreate(addCategoryDTO));
+            string res = _CategoryService.CategoryCreate(addCategoryDTO);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                return BadRequest(res);
+            }
+            return Ok("Success Add Category");
         }
         [HttpPut("/category")]
-        public ActionResult UpdatedCategory(int Id, [FromBody] AddCategoryDTO addCategoryDTO)
+        public ActionResult UpdatedCategory(int Id, [FromForm] AddCategoryDTO addCategoryDTO)
         {
-            return Ok(_CategoryService.CategoryUpdate(Id, addCategoryDTO));
+            string res = _CategoryService.CategoryUpdate(Id, addCategoryDTO);
+            if (!string.IsNullOrEmpty(res))
+            {
+                return BadRequest(res);
+            }
+            return Ok("Success Update Category");
         }
         [HttpDelete("/category/{Id}")]
         public ActionResult DeleteCategory(int Id)
         {
-            return Ok(_CategoryService.CategoryDelete(Id));
+            string res = _CategoryService.CategoryDelete(Id);
+            if (!string.IsNullOrEmpty(res))
+            {
+                return BadRequest(res);
+            }
+            return Ok("Successfull Delete");
         }
-
     }
 }
