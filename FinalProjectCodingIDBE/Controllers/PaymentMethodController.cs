@@ -1,5 +1,6 @@
 ﻿using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinalProjectCodingIDBE.Controllers
@@ -15,6 +16,7 @@ namespace FinalProjectCodingIDBE.Controllers
             _paymentService = paymentService;
         }
 
+        [Authorize]
         [HttpGet("/paymentMethod")]
         public IActionResult GetAll()
         {
