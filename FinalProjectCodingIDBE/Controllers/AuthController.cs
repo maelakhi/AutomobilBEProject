@@ -1,4 +1,5 @@
 ﻿using FinalProjectCodingIDBE.Dto.Auth;
+using FinalProjectCodingIDBE.DTOs.AuthDTO;
 using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Helpers;
 using FinalProjectCodingIDBE.Models;
@@ -6,6 +7,7 @@ using FinalProjectCodingIDBE.Repositories;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace FinalProjectCodingIDBE.Controllers
 {
@@ -23,6 +25,20 @@ namespace FinalProjectCodingIDBE.Controllers
         [HttpPost("/Login")]
         public ActionResult Login([FromBody] LoginDto data)
         {
+            string validationPass = ValidationHelper.ValidationPassword(data.Password);
+       
+            if (!string.IsNullOrEmpty(validationPass))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPass
+                        }
+                    );
+            }
+
             string hashedPassword = PasswordHelper.HashPassword(data.Password);
 
             data.Password = hashedPassword;
@@ -55,40 +71,78 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpPost("/Register")]
-        public ActionResult Register([FromBody] RegisterDto data)
+        public async Task<ActionResult> Register([FromBody] RegisterDto data)
         {
-            Users? userExist = _userService.GetByEmail(data.Email);
-
-            Console.WriteLine(userExist?.Email);
-            if(userExist != null)
+            /*Validasi Password*/
+            string validationPass = ValidationHelper.ValidationPassword(data.Password);
+            if (!string.IsNullOrEmpty(validationPass))
             {
-               return StatusCode(
-                       (int)HttpStatusCode.Accepted,
-                       new
-                       {
-                           status = HttpStatusCode.Accepted,
-                           message = "Email sudah terdaftar"
-                       }
-                   );
-            }
-
-            string hashedPassword = PasswordHelper.HashPassword(data.Password);
-
-            data.Password = hashedPassword;
-
-            string res = _userService.CreateAccount(data);
-
-            if (!string.IsNullOrEmpty(res))
-            {
-                StatusCode(
+                return StatusCode(
                         (int)HttpStatusCode.Accepted,
                         new
                         {
                             status = HttpStatusCode.Accepted,
-                            message = res
+                            message = validationPass
                         }
                     );
             }
+
+            /*Validasi Confirm Password*/
+            string validationPassCon = ValidationHelper.ValidationConfirmPassword(data.Password, data.ConfirmPassword);
+            if (!string.IsNullOrEmpty(validationPassCon))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPassCon
+                        }
+                    );
+            }
+
+            Users? userExist = _userService.GetByEmail(data.Email);
+
+            if (userExist != null)
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Email sudah terdaftar"
+                        }
+                    );
+            }
+
+            string hashedPassword = PasswordHelper.HashPassword(data.Password);
+            string verificationToken = Guid.NewGuid().ToString();
+
+            data.Password = hashedPassword;
+
+            string res = _userService.CreateAccount(data, verificationToken);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Create Account Failed!"
+                        }
+                    );
+            }
+
+            string htmlEmail = $@"
+                                Hello <b>{data.Email}</b>, please click link below to verify<br/>
+                                <a href='http://localhost:5173/confirmationEmail/{verificationToken}'>
+                                    <button>Verify My Account</botton>
+                                </a>
+                                ";
+
+            await MailHelper.Send("Dear User", data.Email, "Email Verification", htmlEmail);
+
 
             return StatusCode(
                         (int)HttpStatusCode.OK,
@@ -98,6 +152,60 @@ namespace FinalProjectCodingIDBE.Controllers
                             message = "Create Account Successfull!"
                         }
                     );
+
+        }
+
+        [HttpPost("/verifiedEmail")]
+        public ActionResult VerifiedAccount([FromBody] VerifiedDTO data)
+        {
+            Users? userExits = _userService.GetAccountByToken(data);
+
+            if (userExits.Id == 0)
+            {
+                return StatusCode(
+                       (int)HttpStatusCode.NotFound,
+                       new
+                       {
+                           status = HttpStatusCode.NotFound,
+                           message = "Token invalid"
+                       }
+                   );
+            }
+/*
+            if (userExits.VerificationExpiredToken <= DateTime.Now)
+            {
+                return StatusCode(
+                       (int)HttpStatusCode.Accepted,
+                       new
+                       {
+                           status = HttpStatusCode.Accepted,
+                           message = "Token is Expired"
+                       }
+                   );
+            }*/
+
+            string res = _userService.SetAccountVerified(userExits.Id);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                return StatusCode(
+                       (int)HttpStatusCode.NotFound,
+                       new
+                       {
+                           status = HttpStatusCode.NotFound,
+                           message = res
+                       }
+                   );
+            }
+
+            return StatusCode(
+                       (int)HttpStatusCode.OK,
+                       new
+                       {
+                           status = HttpStatusCode.OK,
+                           message = "Account Verified"
+                       }
+                   );
 
         }
 
