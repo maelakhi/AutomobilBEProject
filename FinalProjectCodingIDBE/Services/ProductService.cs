@@ -59,5 +59,11 @@ namespace FinalProjectCodingIDBE.Services
             List<ProductsResponseDTO> products = _productsRepository.GetProductsByCategory(categoryName);
             return products;
         }
+
+        public List<ProductsResponseDTO> GetByCategoryProductsId(int Id)
+        {
+            List<ProductsResponseDTO> products = _productsRepository.GetProductsByCategoryId(Id);
+            return products;
+        }
     }
 }
