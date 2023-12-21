@@ -9,5 +9,8 @@
         public string UpdatedAt { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public string Role { get; set; } = string.Empty;
+        public string VerificationToken { get; set; } = string.Empty;
+        public DateTime VerificationExpiredToken { get; set; }
+        public bool IsVerified { get; set; }
     }
 }
