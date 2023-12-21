@@ -1,4 +1,5 @@
-﻿using FinalProjectCodingIDBE.Models;
+﻿using FinalProjectCodingIDBE.DTOs.PaymentDTO;
+using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
 
 namespace FinalProjectCodingIDBE.Services
@@ -20,6 +21,20 @@ namespace FinalProjectCodingIDBE.Services
         public PaymentMethod GetPaymentMethodById(int Id)
         {
             return _paymentMethodRepository.GetPaymentById(Id);
+        }
+
+        public string AddPayment(AddPaymentDTO payment)
+        {
+            return _paymentMethodRepository.AddPaymentMethod(payment);
+        }
+        public string UpdatePayment(int Id, AddPaymentDTO payment)
+        {
+            return _paymentMethodRepository.UpdatePaymentMethod(Id, payment);
+        }
+
+        public string DeletePayment(int Id)
+        {
+            return _paymentMethodRepository.DeletePaymentMethod(Id);
         }
     }
 }
