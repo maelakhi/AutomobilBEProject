@@ -7,6 +7,7 @@ using FinalProjectCodingIDBE.Repositories;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace FinalProjectCodingIDBE.Controllers
 {
@@ -24,6 +25,20 @@ namespace FinalProjectCodingIDBE.Controllers
         [HttpPost("/Login")]
         public ActionResult Login([FromBody] LoginDto data)
         {
+            string validationPass = ValidationHelper.ValidationPassword(data.Password);
+       
+            if (!string.IsNullOrEmpty(validationPass))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPass
+                        }
+                    );
+            }
+
             string hashedPassword = PasswordHelper.HashPassword(data.Password);
 
             data.Password = hashedPassword;
@@ -58,18 +73,46 @@ namespace FinalProjectCodingIDBE.Controllers
         [HttpPost("/Register")]
         public async Task<ActionResult> Register([FromBody] RegisterDto data)
         {
+            /*Validasi Password*/
+            string validationPass = ValidationHelper.ValidationPassword(data.Password);
+            if (!string.IsNullOrEmpty(validationPass))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPass
+                        }
+                    );
+            }
+
+            /*Validasi Confirm Password*/
+            string validationPassCon = ValidationHelper.ValidationConfirmPassword(data.Password, data.ConfirmPassword);
+            if (!string.IsNullOrEmpty(validationPassCon))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPassCon
+                        }
+                    );
+            }
+
             Users? userExist = _userService.GetByEmail(data.Email);
 
-            if(userExist != null)
+            if (userExist != null)
             {
-               return StatusCode(
-                       (int)HttpStatusCode.Accepted,
-                       new
-                       {
-                           status = HttpStatusCode.Accepted,
-                           message = "Email sudah terdaftar"
-                       }
-                   );
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Email sudah terdaftar"
+                        }
+                    );
             }
 
             string hashedPassword = PasswordHelper.HashPassword(data.Password);
