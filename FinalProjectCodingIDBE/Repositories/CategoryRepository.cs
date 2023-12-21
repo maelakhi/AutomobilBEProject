@@ -113,7 +113,6 @@ namespace FinalProjectCodingIDBE.Repositories
         public string UpdateCategory(int Id, AddCategoryDTO categoryDTO, string fileUrlPath)
         {
             string response = string.Empty;
-            Category category = GetCategoryById(Id);
             MySqlConnection conn = new MySqlConnection(_connectionString);
             DateTime now = DateTime.Now;
 
@@ -128,8 +127,8 @@ namespace FinalProjectCodingIDBE.Repositories
                 conn.Open();
                 string sql = "UPDATE Category SET category_name=@categoryName, category_desc=@categoryDesc, image_path=@imagePath,updated_at=@updatedAt WHERE category_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@categoryName", category.Name);
-                cmd.Parameters.AddWithValue("@categoryDesc", category.Description);
+                cmd.Parameters.AddWithValue("@categoryName", categoryDTO.Name);
+                cmd.Parameters.AddWithValue("@categoryDesc", categoryDTO.Description);
                 cmd.Parameters.AddWithValue("@updatedAt", now);
                 cmd.Parameters.AddWithValue("@Id", Id);
                 cmd.Parameters.AddWithValue("@imagePath", fileUrlPath);
