@@ -39,6 +39,7 @@ namespace FinalProjectCodingIDBE.Repositories
                         IdUser = reader.GetInt32("id_user"),
                         IdPayment = reader.GetInt32("id_payment"),
                         StatusPayment = reader.GetString("status_payment"),
+                        TotalAmount = reader.GetInt32("total_amount"),
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at")
                     });
