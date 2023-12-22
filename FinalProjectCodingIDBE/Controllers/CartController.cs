@@ -67,16 +67,33 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [Authorize]
-        [HttpDelete("/carts/{userId}/{idCart}")]
-        public ActionResult DeleteById(int userId, int idCart)
+        [HttpDelete("/carts/{idCart}")]
+        public ActionResult DeleteById(int idCart)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
+
             string res = _cartService.CartDelete(userId, idCart);
 
-            if(string.IsNullOrEmpty (res) == false)
+            if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                         (int)HttpStatusCode.NotFound,
+                            new
+                            {
+                                status = HttpStatusCode.NotFound,
+                                message = "Delete Failed"
+                            }
+                       );
             }
-            return Ok("SuccessFully Delete Cart");
+
+            return StatusCode(
+                      (int)HttpStatusCode.OK,
+                      new
+                      {
+                          status = HttpStatusCode.OK,
+                          message = "Succesfuly Delete from Cart"
+                      }
+                  );
         }
 
     }

@@ -44,7 +44,7 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("carts_id"),
                         IdProduct = reader.GetInt32("product_id"),
                         IdUser = reader.GetInt32("id_user"),
-                        DateSchedule = reader.GetString("date_schedule"),
+                        DateSchedule = reader.GetDateTime("date_schedule"),
                         product = product
                     });
                 }
@@ -90,7 +90,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     carts.Id = reader.GetInt32("carts_id");
                     carts.IdProduct = reader.GetInt32("product_id");
                     carts.IdUser = reader.GetInt32("id_user");
-                    carts.DateSchedule = reader.GetString("date_schedule");
+                    carts.DateSchedule = reader.GetDateTime("date_schedule");
                     carts.product = product;
                 }
 
