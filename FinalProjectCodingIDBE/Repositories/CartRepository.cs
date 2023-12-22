@@ -112,12 +112,15 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "INSERT INTO Carts (carts_id,id_product,id_user, date_schedule) VALUES (@cartsId,@productId,@idUser,@dateShcedule)";
+                string sql = "INSERT INTO Carts (carts_id,id_product,id_user, date_schedule, created_at, updated_at, is_delete) VALUES (@cartsId,@productId,@idUser,@dateShcedule,@createdAt,@updatedAt,@isDelete)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@cartsId", null);
                 cmd.Parameters.AddWithValue("@productId", cartData.IdProduct);
                 cmd.Parameters.AddWithValue("@idUser", cartData.IdUser);
                 cmd.Parameters.AddWithValue("@dateShcedule", cartData.DateSchedule);
+                cmd.Parameters.AddWithValue("@createdAt", now);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isDelete", false);
                 cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
