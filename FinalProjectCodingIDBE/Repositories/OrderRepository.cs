@@ -121,7 +121,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     order.Id = reader.GetInt32("order_id");
                     order.IdUser = reader.GetInt32("id_user");
                     order.IdPayment = reader.GetInt32("id_payment");
-                    order.StatusPayment = reader.GetString("status_paymnet");
+                    order.StatusPayment = reader.GetString("status_payment");
                     order.TotalAmount = reader.GetInt32("total_amount");
                     order.CreatedAt = reader.GetString("created_at");
                     order.UpdatedAt = reader.GetString("updated_at");
