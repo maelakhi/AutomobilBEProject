@@ -31,7 +31,7 @@ namespace FinalProjectCodingIDBE.Controllers
         [HttpPost("/orderById")]
         public ActionResult CreateOrder(int userId, [FromBody] AddOrderDTO addOrderDTO)
         {
-            string res = (_serviceOrder.OrderCreate(userId, addOrderDTO));
+            string res = _serviceOrder.OrderCreate(userId, addOrderDTO);
             if (string.IsNullOrEmpty(res) == false)
             {
                 return BadRequest(res);
