@@ -42,5 +42,19 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _userRepository.SetAccountVerified(Id);
         }
+
+        public string CreateOTPCode(string email, string otpCode)
+        {
+            return _userRepository.CreateOTPCode(email, otpCode);
+        }
+        public Users? GetByOTPCode(OTPverifiedDTO data)
+        {
+            return _userRepository.GetByOTPCode(data);
+        }
+        public string SetNewPassword(CreateNewPasswordDTO data,int Id)
+        {
+            return _userRepository.SetNewPassword(data, Id);
+        }
+
     }
 }

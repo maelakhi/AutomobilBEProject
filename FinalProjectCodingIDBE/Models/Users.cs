@@ -12,5 +12,8 @@
         public string VerificationToken { get; set; } = string.Empty;
         public DateTime VerificationExpiredToken { get; set; }
         public bool IsVerified { get; set; }
+
+        public string ResetPasswordToken { get; set; } = string.Empty;
+        public DateTime ResetPasswordTokenExpired { get; set; }
     }
 }
