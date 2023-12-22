@@ -29,7 +29,7 @@ namespace FinalProjectCodingIDBE.Helpers
             using (var smtp = new SmtpClient())
             {
                 await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-                await smtp.AuthenticateAsync("emial", "key");
+                await smtp.AuthenticateAsync("email", "password");
                 await smtp.SendAsync(message);
                 await smtp.DisconnectAsync(true);
             }
