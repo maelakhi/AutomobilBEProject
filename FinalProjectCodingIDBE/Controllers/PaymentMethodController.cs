@@ -15,10 +15,12 @@ namespace FinalProjectCodingIDBE.Controllers
     public class PaymentMethodController : ControllerBase
     {
         private readonly PaymentMethodService _paymentService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public PaymentMethodController(PaymentMethodService paymentService)
+        public PaymentMethodController(PaymentMethodService paymentService, IWebHostEnvironment webHostEnvironment)
         {
             _paymentService = paymentService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [Authorize]
@@ -45,11 +47,27 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(payment);
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        /*[Authorize(Roles = "admin")]*/
         [HttpPost("/paymentMethod")]
-        public ActionResult AddPayment([FromBody] AddPaymentDTO payment)
+        public async Task <ActionResult> AddPayment([FromForm] AddPaymentDTO paymentDTO)
         {
-            string res = _paymentService.AddPayment(payment);
+            IFormFile? image = paymentDTO.Image!;
+
+            var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
+
+            string fileName = Guid.NewGuid().ToString() + extName;
+            string uploadDir = "uploadsPaymentIcon";
+            string physicalPath = $"wwwroot/{uploadDir}";
+
+            var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
+
+            using var stream = System.IO.File.OpenWrite(filePath);
+            await image.CopyToAsync(stream);
+
+            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+
+            string res = _paymentService.AddPayment(paymentDTO, fileUrlPath);
             if (string.IsNullOrEmpty(res) == false)
             {
                 return BadRequest(res);
@@ -57,11 +75,27 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Succesfully Add Payment Method");
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        /*[Authorize(Roles = "admin")]*/
         [HttpPut("/paymentMethod")]
-        public ActionResult UpdatedPayment(int Id, [FromBody] AddPaymentDTO payment)
+        public async Task<ActionResult> UpdatedPayment(int Id, [FromForm] AddPaymentDTO payment)
         {
-            string res = _paymentService.UpdatePayment(Id, payment);
+            IFormFile image = payment.Image!;
+
+            var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
+
+            string fileName = Guid.NewGuid().ToString() + extName;
+            string uploadDir = "uploadsPaymentIcon";
+            string physicalPath = $"wwwroot/{uploadDir}";
+
+            var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
+
+            using var stream = System.IO.File.OpenWrite(filePath);
+            await image.CopyToAsync(stream);
+
+            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+
+            string res = _paymentService.UpdatePayment(Id, payment, fileUrlPath);
             if (!string.IsNullOrEmpty(res))
             {
                 return BadRequest(res);
@@ -69,6 +103,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Success Update Payment Method");
         }
 
+        [Authorize]
+        /*[Authorize(Roles = "admin")]*/
         [HttpDelete("/paymentMethod")]
         public ActionResult DeletePayment(int Id)
         {

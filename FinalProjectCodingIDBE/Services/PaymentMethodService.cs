@@ -23,13 +23,13 @@ namespace FinalProjectCodingIDBE.Services
             return _paymentMethodRepository.GetPaymentById(Id);
         }
 
-        public string AddPayment(AddPaymentDTO payment)
+        public string AddPayment(AddPaymentDTO payment, string fileUrlPath)
         {
-            return _paymentMethodRepository.AddPaymentMethod(payment);
+            return _paymentMethodRepository.AddPaymentMethod(payment, fileUrlPath);
         }
-        public string UpdatePayment(int Id, AddPaymentDTO payment)
+        public string UpdatePayment(int Id, AddPaymentDTO payment, string filePathUrl)
         {
-            return _paymentMethodRepository.UpdatePaymentMethod(Id, payment);
+            return _paymentMethodRepository.UpdatePaymentMethod(Id, payment, filePathUrl);
         }
 
         public string DeletePayment(int Id)

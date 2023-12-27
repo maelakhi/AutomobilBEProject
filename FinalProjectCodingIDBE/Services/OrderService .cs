@@ -26,9 +26,11 @@ namespace FinalProjectCodingIDBE.Services
         {
              return _orderRepository.CreateOrder(userId,cartData);
         }
-        /* public string CartDelete(int idUser, int idCart)
-         {
-             return _cartRepository.DeleteCart(idUser, idCart);
-         }*/
+
+        public string CreateOrderInvoice(int userId, AddOrderDTO cartData)
+        {
+            return _orderRepository.CreateOrderInvoice(userId, cartData);
+        }
+
     }
 }

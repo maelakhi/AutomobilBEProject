@@ -35,7 +35,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(_productService.GetByIdProducts(Id));
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpPost("/products")]
         public async Task<ActionResult> CreateProduct([FromForm] AddProductsDTO addProductsDTO)
         {
@@ -63,7 +64,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Success Add Product");
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpPut("/products")]
         public async Task<ActionResult> UpdatedProduct(int Id, [FromForm] AddProductsDTO addProductsDTO)
         {
@@ -91,7 +93,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Success Update Product");
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpPut("/products/Deactived")]
         public ActionResult DeactivedProduct(int Id)
         {
@@ -103,7 +106,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("SuccessFull Deactived");
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpPut("/products/Actived")]
         public ActionResult ActivedProduct(int Id)
         {
@@ -115,7 +119,9 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("SuccessFull Deactived");
         }
 
-        [Authorize(Roles = "admin")]
+
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpDelete("/products/{Id}")]
         public ActionResult DeleteProduct(int Id)
         {

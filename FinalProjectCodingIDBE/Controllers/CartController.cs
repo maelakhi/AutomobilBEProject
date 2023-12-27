@@ -30,8 +30,9 @@ namespace FinalProjectCodingIDBE.Controllers
 
         [Authorize]
         [HttpGet("/carts/{idCart}")]
-        public ActionResult GetCartById(int userId, int idCart)
+        public ActionResult GetCartById(int idCart)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
             return Ok(_cartService.GetCartById(userId, idCart));
         }
 
