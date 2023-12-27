@@ -4,9 +4,9 @@ namespace FinalProjectCodingIDBE.Dto.Auth
 {
     public class LoginDto
     {
-        [DefaultValue("testing@email.com")]
+        [DefaultValue("developprz@gmail.com")]
         public string Email { get; set; } = string.Empty;
-        [DefaultValue("password")]
+        [DefaultValue("Testing123@")]
         public string Password { get; set; } = string.Empty;
     }
 }

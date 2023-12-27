@@ -8,6 +8,7 @@
         public int Quantity { get; set; }
         public int AmountProduct { get; set; }
         public int TotalAmount { get; set; }
+        public string DateSchedule { get; set; } = string.Empty;
         public string CreatedAt { get; set; } = string.Empty;
         public string UpdatedAt { get; set; } = string.Empty;
     }

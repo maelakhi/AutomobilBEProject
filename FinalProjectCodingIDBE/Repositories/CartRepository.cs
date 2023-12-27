@@ -1,6 +1,5 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CartDTO;
 using FinalProjectCodingIDBE.DTOs.ProductDTO;
-using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 
 namespace FinalProjectCodingIDBE.Repositories
@@ -32,8 +31,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = reader.GetString("image_path"),
@@ -59,6 +58,7 @@ namespace FinalProjectCodingIDBE.Repositories
 
         public CartResponseDTO GetByIdCart(int userId, int idCart)
         {
+            Console.WriteLine(userId);
             CartResponseDTO carts = new CartResponseDTO();
 
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -80,8 +80,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = reader.GetString("image_path"),
@@ -104,9 +104,9 @@ namespace FinalProjectCodingIDBE.Repositories
 
         public string CreateCart(AddCartDTO cartData)
         {
+            DateTime now = DateTime.Now;
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
-            DateTime now = DateTime.Now;
 
             try
             {
