@@ -1,6 +1,5 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CartDTO;
 using FinalProjectCodingIDBE.DTOs.ProductDTO;
-using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 
 namespace FinalProjectCodingIDBE.Repositories
@@ -32,8 +31,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = reader.GetString("image_path"),
@@ -44,7 +43,7 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("carts_id"),
                         IdProduct = reader.GetInt32("product_id"),
                         IdUser = reader.GetInt32("id_user"),
-                        DateSchedule = reader.GetString("date_schedule"),
+                        DateSchedule = reader.GetDateTime("date_schedule"),
                         product = product
                     });
                 }
@@ -59,6 +58,7 @@ namespace FinalProjectCodingIDBE.Repositories
 
         public CartResponseDTO GetByIdCart(int userId, int idCart)
         {
+            Console.WriteLine(userId);
             CartResponseDTO carts = new CartResponseDTO();
 
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -80,8 +80,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = reader.GetString("image_path"),
@@ -90,7 +90,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     carts.Id = reader.GetInt32("carts_id");
                     carts.IdProduct = reader.GetInt32("product_id");
                     carts.IdUser = reader.GetInt32("id_user");
-                    carts.DateSchedule = reader.GetString("date_schedule");
+                    carts.DateSchedule = reader.GetDateTime("date_schedule");
                     carts.product = product;
                 }
 
@@ -104,20 +104,23 @@ namespace FinalProjectCodingIDBE.Repositories
 
         public string CreateCart(AddCartDTO cartData)
         {
+            DateTime now = DateTime.Now;
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
-            DateTime now = DateTime.Now;
 
             try
             {
                 conn.Open();
 
-                string sql = "INSERT INTO Carts (carts_id,id_product,id_user, date_schedule) VALUES (@cartsId,@productId,@idUser,@dateShcedule)";
+                string sql = "INSERT INTO Carts (carts_id,id_product,id_user, date_schedule, created_at, updated_at, is_delete) VALUES (@cartsId,@productId,@idUser,@dateShcedule,@createdAt,@updatedAt,@isDelete)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@cartsId", null);
                 cmd.Parameters.AddWithValue("@productId", cartData.IdProduct);
                 cmd.Parameters.AddWithValue("@idUser", cartData.IdUser);
                 cmd.Parameters.AddWithValue("@dateShcedule", cartData.DateSchedule);
+                cmd.Parameters.AddWithValue("@createdAt", now);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isDelete", false);
                 cmd.ExecuteNonQuery();
             }
             catch (Exception ex)

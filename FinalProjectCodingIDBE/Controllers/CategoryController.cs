@@ -4,6 +4,7 @@ using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FinalProjectCodingIDBE.Controllers
 {
@@ -31,7 +32,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(_CategoryService.GetByIdCategory(Id));
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpPost("/category")]
         public async Task<ActionResult> CreateCategory([FromForm] AddCategoryDTO addCategoryDTO)
         {
@@ -59,10 +61,12 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Success Add Category");
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         [HttpPut("/category")]
-        public async Task<ActionResult> UpdatedCategory(int Id, [FromForm] AddCategoryDTO addCategoryDTO)
+        public async Task<ActionResult> UpdatedCategory([FromForm] AddCategoryDTO addCategoryDTO)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
             IFormFile image = addCategoryDTO.Image!;
 
             var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
@@ -78,7 +82,7 @@ namespace FinalProjectCodingIDBE.Controllers
 
             string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
 
-            string res = _CategoryService.CategoryUpdate(Id, addCategoryDTO, fileUrlPath);
+            string res = _CategoryService.CategoryUpdate(userId, addCategoryDTO, fileUrlPath);
 
             if (!string.IsNullOrEmpty(res))
             {
@@ -87,7 +91,8 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Success Update Category");
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        // [Authorize(Roles = "admin")]
         [HttpDelete("/category/{Id}")]
         public ActionResult DeleteCategory(int Id)
         {
@@ -98,5 +103,12 @@ namespace FinalProjectCodingIDBE.Controllers
             }
             return Ok("Successfull Delete");
         }
+
+        [HttpGet("/CategoryLimit")]
+        public ActionResult GetCategoryLimit()
+        {
+            return Ok(_CategoryService.GetCategoryLimit());
+        }
+
     }
 }

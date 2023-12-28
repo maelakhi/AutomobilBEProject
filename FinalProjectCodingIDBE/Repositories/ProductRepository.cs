@@ -33,8 +33,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = reader.GetString("image_path"),
@@ -71,8 +71,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     product.Name = reader.GetString("product_name");
                     product.Description = reader.GetString("product_desc");
                     product.Price = reader.GetInt32("product_price");
-                    product.CreatedAt = reader.GetString("created_at");
-                    product.UpdatedAt = reader.GetString("updated_at");
+                    product.CreatedAt = reader.GetDateTime("created_at");
+                    product.UpdatedAt = reader.GetDateTime("updated_at");
                     product.IdCategory = reader.GetInt32("id_category");
                     product.ImagePath = reader.GetString("image_path");
                     product.IsActive = reader.GetBoolean("is_active");
@@ -259,8 +259,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         ImagePath = reader.GetString("image_path"),
                         IsActive = reader.GetBoolean("is_active"),
@@ -297,8 +297,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         ImagePath = reader.GetString("image_path"),
                         IsActive = reader.GetBoolean("is_active"),
@@ -338,8 +338,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         ImagePath = reader.GetString("image_path"),
                         IsActive = reader.GetBoolean("is_active"),

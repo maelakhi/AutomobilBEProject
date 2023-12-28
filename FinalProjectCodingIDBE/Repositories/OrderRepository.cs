@@ -3,16 +3,19 @@ using FinalProjectCodingIDBE.DTOs.OrderDTO;
 using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace FinalProjectCodingIDBE.Repositories
 {
     public class OrderRepository
     {
         private readonly string _connectionString = string.Empty;
+        private readonly ProductRepository _productRepository;
 
-        public OrderRepository(IConfiguration configuration)
+        public OrderRepository(IConfiguration configuration, ProductRepository productRepository)
         {
             _connectionString = configuration.GetConnectionString("Default");
+            _productRepository = productRepository;
         }
 
         public List<OrderResponseDTO> GetAllOrders(int userId)
@@ -39,8 +42,9 @@ namespace FinalProjectCodingIDBE.Repositories
                         IdUser = reader.GetInt32("id_user"),
                         IdPayment = reader.GetInt32("id_payment"),
                         StatusPayment = reader.GetString("status_payment"),
+                        TotalAmount = reader.GetInt32("total_amount"),
                         CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at")
+                        UpdatedAt = reader.GetString("updated_at"),
                     });
                 }                
             }
@@ -87,7 +91,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         AmountProduct = reader.GetInt32("amount_product"),
                         TotalAmount = reader.GetInt32("total_amount"),
                         CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at")
+                        UpdatedAt = reader.GetString("updated_at"),
+                        DateSchedule = reader.GetString("date_schedule")
                     });
                 }
 
@@ -120,7 +125,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     order.Id = reader.GetInt32("order_id");
                     order.IdUser = reader.GetInt32("id_user");
                     order.IdPayment = reader.GetInt32("id_payment");
-                    order.StatusPayment = reader.GetString("status_paymnet");
+                    order.StatusPayment = reader.GetString("status_payment");
                     order.TotalAmount = reader.GetInt32("total_amount");
                     order.CreatedAt = reader.GetString("created_at");
                     order.UpdatedAt = reader.GetString("updated_at");
@@ -146,7 +151,86 @@ namespace FinalProjectCodingIDBE.Repositories
             OrderResponseDTO order = new OrderResponseDTO();
 
             MySqlConnection conn = new MySqlConnection(_connectionString);
-            DateTime now = new DateTime();
+            DateTime now = DateTime.UtcNow.ToLocalTime();
+
+            conn.Open();
+            MySqlTransaction transaction = conn.BeginTransaction();
+
+            foreach (var item in addOrderDTO.CartsID)
+            {
+                CartResponseDTO cartForAmount = GetByIdCartOrder(userId, item);
+                Console.WriteLine(cartForAmount.product.Name);
+                totalAmount += cartForAmount.product.Price;
+                cartsList.Add(cartForAmount);
+            }
+
+            try
+            {
+
+                string sql = "INSERT INTO order_header (order_id,id_user,id_payment,status_payment,total_amount,created_at,updated_at,is_delete) VALUES (@idOrder,@idUser,@idPayment,@statusPayment,@totalAmount,@createdAt,@updatedAt,@isDelete)";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Transaction = transaction;
+                cmd.Parameters.AddWithValue("@idOrder", null);
+                cmd.Parameters.AddWithValue("@idUser", userId);
+                cmd.Parameters.AddWithValue("@idPayment", addOrderDTO.IdPayment);
+                cmd.Parameters.AddWithValue("@statusPayment", "PAID");
+                cmd.Parameters.AddWithValue("@totalAmount", totalAmount);
+                cmd.Parameters.AddWithValue("@createdAt", now);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isDelete", false);
+                cmd.ExecuteNonQuery();
+
+                var lastInsertedId = cmd.LastInsertedId;
+
+                foreach (var item in cartsList)
+                {
+                    sql = "INSERT INTO order_details (order_detail_id,id_order,id_product,quantity,amount_product,total_amount,created_at,updated_at,is_delete,date_schedule) VALUES (@idOrderDetail,@idOrder,@idProduct,@quantity,@amountProduct,@totalAmount,@createdAt,@updatedAt,@isDelete,@dateSchedule)";
+                    cmd = new MySqlCommand(sql, conn);
+                    cmd.Transaction = transaction;
+                    cmd.Parameters.AddWithValue("@idOrderDetail", null);
+                    cmd.Parameters.AddWithValue("@idOrder", lastInsertedId);
+                    cmd.Parameters.AddWithValue("@idProduct", item.IdProduct);
+                    cmd.Parameters.AddWithValue("@quantity", 1);
+                    cmd.Parameters.AddWithValue("@amountProduct", item.product.Price);
+                    cmd.Parameters.AddWithValue("@totalAmount", item.product.Price);
+                    cmd.Parameters.AddWithValue("@createdAt", now);
+                    cmd.Parameters.AddWithValue("@updatedAt", now);
+                    cmd.Parameters.AddWithValue("@isDelete", false);
+                    cmd.Parameters.AddWithValue("@dateSchedule", item.DateSchedule);
+                    cmd.ExecuteNonQuery();
+
+                    sql = "DELETE FROM Carts WHERE carts_id = @idCart AND id_user=@idUser";
+                    cmd = new MySqlCommand(sql, conn);
+                    cmd.Transaction = transaction;
+                    cmd.Parameters.AddWithValue("@idCart", item.Id);
+                    cmd.Parameters.AddWithValue("@idUser", userId);
+                    cmd.ExecuteNonQuery();
+
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+            conn.Close();
+
+
+            return response;
+        }
+
+        public string CreateOrderInvoice(int userId, AddOrderDTO addOrderDTO)
+        {
+            DateTime now = DateTime.UtcNow.ToLocalTime();
+            string response = string.Empty;
+            int totalAmount = 0;
+            List<CartResponseDTO> cartsList = new List<CartResponseDTO>();
+            OrderResponseDTO order = new OrderResponseDTO();
+
+            MySqlConnection conn = new MySqlConnection(_connectionString);
 
             conn.Open();
             MySqlTransaction transaction = conn.BeginTransaction();
@@ -174,15 +258,26 @@ namespace FinalProjectCodingIDBE.Repositories
                 cmd.Parameters.AddWithValue("@isDelete", false);
                 cmd.ExecuteNonQuery();
 
-                var lastInsertedId = cmd.LastInsertedId;
+                var lastInsertedIdOrder = cmd.LastInsertedId;
+
+                sql = "INSERT INTO Invoices (invoice_id, id_order, status, created_at, updated_at, is_delete) VALUES (@idInvoice, @idOrder, @status, @createdAt, @updatedAt, @isDelete)";
+                cmd = new MySqlCommand(sql, conn);
+                cmd.Transaction = transaction;
+                cmd.Parameters.AddWithValue("@idInvoice", null);
+                cmd.Parameters.AddWithValue("@idOrder", lastInsertedIdOrder);
+                cmd.Parameters.AddWithValue("@status", "PAID");
+                cmd.Parameters.AddWithValue("@createdAt", now);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isDelete", false);
+                cmd.ExecuteNonQuery();
 
                 foreach (var item in cartsList)
                 {
-                    sql = "INSERT INTO order_details (order_detail_id,id_order,id_product,quantity,amount_product,total_amount,created_at,updated_at,is_delete) VALUES (@idOrderDetail,@idOrder,@idProduct,@quantity,@amountProduct,@totalAmount,@createdAt,@updatedAt,@isDelete)";
+                    sql = "INSERT INTO order_details (order_detail_id,id_order,id_product,quantity,amount_product,total_amount,created_at,updated_at,is_delete,date_schedule) VALUES (@idOrderDetail,@idOrder,@idProduct,@quantity,@amountProduct,@totalAmount,@createdAt,@updatedAt,@isDelete,@dateSchedule)";
                     cmd = new MySqlCommand(sql, conn);
                     cmd.Transaction = transaction;
                     cmd.Parameters.AddWithValue("@idOrderDetail", null);
-                    cmd.Parameters.AddWithValue("@idOrder", lastInsertedId);
+                    cmd.Parameters.AddWithValue("@idOrder", lastInsertedIdOrder);
                     cmd.Parameters.AddWithValue("@idProduct", item.IdProduct);
                     cmd.Parameters.AddWithValue("@quantity", 1);
                     cmd.Parameters.AddWithValue("@amountProduct", item.product.Price);
@@ -190,6 +285,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     cmd.Parameters.AddWithValue("@createdAt", now);
                     cmd.Parameters.AddWithValue("@updatedAt", now);
                     cmd.Parameters.AddWithValue("@isDelete", false);
+                    cmd.Parameters.AddWithValue("@dateSchedule", item.DateSchedule);
                     cmd.ExecuteNonQuery();
 
                     sql = "DELETE FROM Carts WHERE carts_id = @idCart AND id_user=@idUser";
@@ -198,8 +294,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     cmd.Parameters.AddWithValue("@idCart", item.Id);
                     cmd.Parameters.AddWithValue("@idUser", userId);
                     cmd.ExecuteNonQuery();
-
                 }
+
                 transaction.Commit();
             }
             catch (Exception ex)
@@ -237,8 +333,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Name = reader.GetString("product_name"),
                         Description = reader.GetString("product_desc"),
                         Price = reader.GetInt32("product_price"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IdCategory = reader.GetInt32("id_category"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = reader.GetString("image_path"),
@@ -247,7 +343,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     carts.Id = reader.GetInt32("carts_id");
                     carts.IdProduct = reader.GetInt32("product_id");
                     carts.IdUser = reader.GetInt32("id_user");
-                    carts.DateSchedule = reader.GetString("date_schedule");
+                    carts.DateSchedule = reader.GetDateTime("date_schedule");
                     carts.product = product;
                 }
 
@@ -256,7 +352,49 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 Console.WriteLine(ex.ToString());
             }
+            conn.Close();
+
             return carts;
+        }
+
+        public List<OrderDetailsResponseDTO> GetOrderDetailByUser(int userId)
+        {
+            List<OrderDetailsResponseDTO> orderDetails = new List<OrderDetailsResponseDTO>();
+
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT od.* FROM order_header oh LEFT JOIN order_details od ON oh.order_id = od.id_order WHERE oh.id_user = @idUser ORDER BY date_schedule, id_product ASC;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@idUser", userId);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    orderDetails.Add(new OrderDetailsResponseDTO()
+                    {
+                        Id = reader.GetInt32("order_detail_id"),
+                        DateSchedule = reader.GetDateTime("date_schedule"),
+                        IdProduct = reader.GetInt32("id_product"),
+                    });
+                }
+
+                foreach (var item in orderDetails)
+                {
+                    ProductsResponseDTO product = _productRepository.GetProductsById(item.IdProduct);
+                    item.Product = product;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            conn.Close();
+
+            return orderDetails;
         }
     }
 }

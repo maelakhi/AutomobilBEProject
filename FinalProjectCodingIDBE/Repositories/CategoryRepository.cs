@@ -113,7 +113,6 @@ namespace FinalProjectCodingIDBE.Repositories
         public string UpdateCategory(int Id, AddCategoryDTO categoryDTO, string fileUrlPath)
         {
             string response = string.Empty;
-            Category category = GetCategoryById(Id);
             MySqlConnection conn = new MySqlConnection(_connectionString);
             DateTime now = DateTime.Now;
 
@@ -128,8 +127,8 @@ namespace FinalProjectCodingIDBE.Repositories
                 conn.Open();
                 string sql = "UPDATE Category SET category_name=@categoryName, category_desc=@categoryDesc, image_path=@imagePath,updated_at=@updatedAt WHERE category_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@categoryName", category.Name);
-                cmd.Parameters.AddWithValue("@categoryDesc", category.Description);
+                cmd.Parameters.AddWithValue("@categoryName", categoryDTO.Name);
+                cmd.Parameters.AddWithValue("@categoryDesc", categoryDTO.Description);
                 cmd.Parameters.AddWithValue("@updatedAt", now);
                 cmd.Parameters.AddWithValue("@Id", Id);
                 cmd.Parameters.AddWithValue("@imagePath", fileUrlPath);
@@ -182,6 +181,41 @@ namespace FinalProjectCodingIDBE.Repositories
 
             conn.Close();
             return response;
+        }
+
+        public List<Category> GetCategoryLimit()
+        {
+            List<Category> category = new List<Category>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT * FROM Category WHERE is_delete = false LIMIT 8;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
+                    category.Add(new Category()
+                    {
+                        Id = reader.GetInt32("category_id"),
+                        Name = reader.GetString("category_name"),
+                        Description = reader.GetString("category_desc"),
+                        CreatedAt = reader.GetString("created_at"),
+                        UpdatedAt = reader.GetString("updated_at"),
+                        ImagePath = image
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return category;
         }
     }
 }

@@ -4,6 +4,7 @@ using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Helpers;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace FinalProjectCodingIDBE.Repositories
 {
@@ -176,6 +177,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     user.Id = reader.GetInt32("user_id");
                     user.Email = reader.GetString("user_email");
                     user.Role = reader.GetString("role_user");
+                    user.VerificationExpiredToken = reader.GetDateTime("verification_expired_token");
                 }
             }
             catch (Exception ex)
@@ -202,6 +204,94 @@ namespace FinalProjectCodingIDBE.Repositories
                 cmd.Parameters.AddWithValue("@isVerified", true);
                 cmd.Parameters.AddWithValue("@isActive", true);
                 cmd.Parameters.AddWithValue("@idUser", Id);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+        public string CreateOTPCode(string email, string otpCode)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            DateTime now = DateTime.Now;
+
+            try
+            {
+                conn.Open();
+
+                string sql = "UPDATE Users SET reset_password_token = @isOTP, reset_password_token_exp = @OTPexp WHERE user_email = @emailUser";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isOTP", otpCode);
+                cmd.Parameters.AddWithValue("@emailUser", email);
+                cmd.Parameters.AddWithValue("@OTPexp", now.AddHours(1));
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
+        public Users? GetByOTPCode(OTPverifiedDTO data)
+        {
+            Users? user = null;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            DateTime now = DateTime.Now;
+
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT user_id, user_email, reset_password_token_exp FROM Users WHERE reset_password_token = @isOTP";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isOTP", data.OTPCode);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    user = new Users();
+                    user.Id = reader.GetInt32("user_id");
+                    user.Email = reader.GetString("user_email");
+                    user.ResetPasswordTokenExpired = reader.GetDateTime("reset_password_token_exp");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return user;
+        }
+
+        public string SetNewPassword(CreateNewPasswordDTO data, int Id)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            DateTime now = DateTime.Now;
+
+            try
+            {
+                conn.Open();
+
+                string sql = "UPDATE users SET user_password = @newPass, updated_at = @updatedAt,reset_password_token_exp = @vrExp,reset_password_token =@vrToken WHERE user_id = @otpCode";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                cmd.Parameters.AddWithValue("@vrExp", null);
+                cmd.Parameters.AddWithValue("@vrToken", string.Empty);
+                cmd.Parameters.AddWithValue("@newPass", data.Password);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@otpCode", Id);
                 cmd.ExecuteNonQuery();
             }
             catch (Exception ex)

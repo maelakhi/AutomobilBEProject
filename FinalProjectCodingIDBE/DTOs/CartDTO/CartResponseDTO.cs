@@ -11,6 +11,6 @@ namespace FinalProjectCodingIDBE.DTOs.CartDTO
         public int IdProduct { get; set; }
 
         public ProductsResponseDTO? product { get; set; }
-        public string DateSchedule { get; set; } = string.Empty;
+        public DateTime DateSchedule { get; set; }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CartDTO;
 using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Security.Claims;
 
 namespace FinalProjectCodingIDBE.Controllers
 {
@@ -17,39 +20,81 @@ namespace FinalProjectCodingIDBE.Controllers
             _cartService = serviceCart;
         }
 
+        [Authorize]
         [HttpGet("/carts")]
-        public ActionResult GetAll(int userId)
+        public ActionResult GetAll()
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
             return Ok(_cartService.GetCartAll(userId));
         }
 
+        [Authorize]
         [HttpGet("/carts/{idCart}")]
-        public ActionResult GetCartById(int userId, int idCart)
+        public ActionResult GetCartById(int idCart)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
             return Ok(_cartService.GetCartById(userId, idCart));
         }
 
+        [Authorize]
         [HttpPost("/carts")]
         public ActionResult AddToCart([FromBody] AddCartDTO cartData )
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
+            cartData.IdUser = userId;
+
             string res = _cartService.CartCreate(cartData);
+
             if(string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                         (int)HttpStatusCode.NotFound,
+                            new
+                            {
+                               status = HttpStatusCode.NotFound,
+                               message = "Token invalid"
+                            }
+                       );
             }
-            return Ok("Succesfuly Add To Cart");
+
+            return StatusCode(
+                      (int)HttpStatusCode.OK,
+                      new
+                      {
+                          status = HttpStatusCode.OK,
+                          message = "Succesfuly Add To Cart"
+                      }
+                  );
         }
 
-        [HttpDelete("/carts/{userId}/{idCart}")]
-        public ActionResult DeleteById(int userId, int idCart)
+        [Authorize]
+        [HttpDelete("/carts/{idCart}")]
+        public ActionResult DeleteById(int idCart)
         {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
+
             string res = _cartService.CartDelete(userId, idCart);
 
-            if(string.IsNullOrEmpty (res) == false)
+            if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                         (int)HttpStatusCode.NotFound,
+                            new
+                            {
+                                status = HttpStatusCode.NotFound,
+                                message = "Delete Failed"
+                            }
+                       );
             }
-            return Ok("SuccessFully Delete Cart");
+
+            return StatusCode(
+                      (int)HttpStatusCode.OK,
+                      new
+                      {
+                          status = HttpStatusCode.OK,
+                          message = "Succesfuly Delete from Cart"
+                      }
+                  );
         }
 
     }
