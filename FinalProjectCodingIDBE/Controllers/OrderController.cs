@@ -36,6 +36,14 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [Authorize]
+        [HttpGet("/orderDetailsByUser")]
+        public ActionResult GetOrderDetailByUser()
+        {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
+            return Ok(_serviceOrder.GetOrderDetailByUser(userId));
+        }
+
+        [Authorize]
         [HttpPost("/order")]
         public ActionResult CreateOrder([FromBody] AddOrderDTO addOrderDTO)
         {

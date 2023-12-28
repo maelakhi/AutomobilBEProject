@@ -10,10 +10,12 @@ namespace FinalProjectCodingIDBE.Repositories
     public class OrderRepository
     {
         private readonly string _connectionString = string.Empty;
+        private readonly ProductRepository _productRepository;
 
-        public OrderRepository(IConfiguration configuration)
+        public OrderRepository(IConfiguration configuration, ProductRepository productRepository)
         {
             _connectionString = configuration.GetConnectionString("Default");
+            _productRepository = productRepository;
         }
 
         public List<OrderResponseDTO> GetAllOrders(int userId)
@@ -310,7 +312,6 @@ namespace FinalProjectCodingIDBE.Repositories
 
         public CartResponseDTO GetByIdCartOrder(int userId, int idCart)
         {
-            Console.WriteLine(userId);
             CartResponseDTO carts = new CartResponseDTO();
 
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -351,7 +352,49 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 Console.WriteLine(ex.ToString());
             }
+            conn.Close();
+
             return carts;
+        }
+
+        public List<OrderDetailsResponseDTO> GetOrderDetailByUser(int userId)
+        {
+            List<OrderDetailsResponseDTO> orderDetails = new List<OrderDetailsResponseDTO>();
+
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT od.* FROM order_header oh LEFT JOIN order_details od ON oh.order_id = od.id_order WHERE oh.id_user = @idUser ORDER BY date_schedule, id_product ASC;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@idUser", userId);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    orderDetails.Add(new OrderDetailsResponseDTO()
+                    {
+                        Id = reader.GetInt32("order_detail_id"),
+                        DateSchedule = reader.GetDateTime("date_schedule"),
+                        IdProduct = reader.GetInt32("id_product"),
+                    });
+                }
+
+                foreach (var item in orderDetails)
+                {
+                    ProductsResponseDTO product = _productRepository.GetProductsById(item.IdProduct);
+                    item.Product = product;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            conn.Close();
+
+            return orderDetails;
         }
     }
 }

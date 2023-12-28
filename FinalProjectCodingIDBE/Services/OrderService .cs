@@ -32,5 +32,10 @@ namespace FinalProjectCodingIDBE.Services
             return _orderRepository.CreateOrderInvoice(userId, cartData);
         }
 
+        public List<OrderDetailsResponseDTO> GetOrderDetailByUser(int userId)
+        {
+            return _orderRepository.GetOrderDetailByUser(userId);
+        }
+
     }
 }
