@@ -103,5 +103,12 @@ namespace FinalProjectCodingIDBE.Controllers
             }
             return Ok("Successfull Delete");
         }
+
+        [HttpGet("/CategoryLimit")]
+        public ActionResult GetCategoryLimit()
+        {
+            return Ok(_CategoryService.GetCategoryLimit());
+        }
+
     }
 }

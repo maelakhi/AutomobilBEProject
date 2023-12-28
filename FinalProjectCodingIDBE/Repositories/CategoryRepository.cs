@@ -182,5 +182,40 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
+
+        public List<Category> GetCategoryLimit()
+        {
+            List<Category> category = new List<Category>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT * FROM Category WHERE is_delete = false LIMIT 8;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
+                    category.Add(new Category()
+                    {
+                        Id = reader.GetInt32("category_id"),
+                        Name = reader.GetString("category_name"),
+                        Description = reader.GetString("category_desc"),
+                        CreatedAt = reader.GetString("created_at"),
+                        UpdatedAt = reader.GetString("updated_at"),
+                        ImagePath = image
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return category;
+        }
     }
 }

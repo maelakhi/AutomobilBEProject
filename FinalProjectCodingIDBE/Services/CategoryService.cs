@@ -38,5 +38,10 @@ namespace FinalProjectCodingIDBE.Services
             string category = _CategorysRepository.DeleteCategory(Id);
             return category;
         }
+
+        public List<Category> GetCategoryLimit()
+        {
+            return _CategorysRepository.GetCategoryLimit();
+        }
     }
 }
