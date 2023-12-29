@@ -13,7 +13,7 @@ namespace FinalProjectCodingIDBE.Services
             _repositoryInvoice = invoiceRepository;
         }
 
-        public List<Invoice> GetInvoiceAll(int userId)
+        public List<MenuInvoiceDTO> GetInvoiceAll(int userId)
         {
             return _repositoryInvoice.GetInvoiceAll(userId);
         }

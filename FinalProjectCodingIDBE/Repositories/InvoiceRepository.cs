@@ -16,28 +16,27 @@ namespace FinalProjectCodingIDBE.Repositories
             _orderRepository = orderRepository;
         }
 
-        public List<Invoice> GetInvoiceAll(int userId)
+        public List<MenuInvoiceDTO> GetInvoiceAll(int userId)
         {
-            List<Invoice> invoiceList = new List<Invoice>();
+            List<MenuInvoiceDTO> invoiceList = new List<MenuInvoiceDTO>();
             MySqlConnection conn = new MySqlConnection(_connectionString);
             try
             {
                 conn.Open();
 
-                string sql = "SELECT *, COUNT(inv.id_order) AS details_item FROM invoices inv LEFT JOIN order_header oh ON inv.id_order = oh.order_id LEFT JOIN order_details od ON oh.order_id = od.id_order  WHERE oh.id_user = @idUser GROUP BY inv.id_order;";
+                string sql = "SELECT inv.invoice_id, inv.created_at, COUNT(inv.id_order) AS total_course, oh.total_amount AS total_price FROM invoices inv LEFT JOIN order_header oh ON inv.id_order = oh.order_id LEFT JOIN order_details od ON oh.order_id = od.id_order  WHERE oh.id_user = @idUser GROUP BY inv.id_order;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@idUser", userId);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    invoiceList.Add(new Invoice()
+                    invoiceList.Add(new MenuInvoiceDTO()
                     {
                         Id = reader.GetInt32("invoice_id"),
-                        IdOrder = reader.GetInt32("id_order"),
-                        Status = reader.GetString("status"),
                         createdAt = reader.GetString("created_at"),
-                        updatedAt = reader.GetString("updated_at")
+                        totalCourse = reader.GetInt32("total_course"),
+                        totalPrice = reader.GetInt32("total_price"),
                     });
                 }
             }
