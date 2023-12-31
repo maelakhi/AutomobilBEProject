@@ -1,7 +1,9 @@
 ﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
+using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace FinalProjectCodingIDBE.Controllers
 {
@@ -23,6 +25,12 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(_productService.GetAllProducts());
         }
 
+        [HttpGet("/productsActived")]
+        public ActionResult GetAllActived()
+        {
+            return Ok(_productService.GetAllProductsActived());
+        }
+
         [HttpGet("/productsLimit")]
         public ActionResult GetLimit()
         {
@@ -35,12 +43,13 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(_productService.GetByIdProducts(Id));
         }
 
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost("/products")]
         public async Task<ActionResult> CreateProduct([FromForm] AddProductsDTO addProductsDTO)
         {
             IFormFile image = addProductsDTO.Image!;
+            Console.WriteLine(image);
+
 
             var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
 
@@ -59,78 +68,163 @@ namespace FinalProjectCodingIDBE.Controllers
             string res = _productService.ProductCreate(addProductsDTO, fileUrlPath);
             if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                     (int)HttpStatusCode.BadRequest,
+                     new
+                     {
+                         status = HttpStatusCode.BadRequest,
+                         message = res
+                     }
+                 );
             }
-            return Ok("Success Add Product");
+            return StatusCode(
+                  (int)HttpStatusCode.OK,
+                  new
+                  {
+                      status = HttpStatusCode.OK,
+                      message = "Success Add Product"
+                  }
+              );
         }
 
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+
+        [Authorize(Roles = "admin")]
         [HttpPut("/products")]
-        public async Task<ActionResult> UpdatedProduct(int Id, [FromForm] AddProductsDTO addProductsDTO)
+        public async Task<ActionResult> UpdatedProduct([FromForm] EditProductsDTO editProductsDTO)
         {
-            IFormFile image = addProductsDTO.Image!;
+            ProductsResponseDTO productExist = _productService.GetByIdProducts(editProductsDTO.ProductID);
+            string fileUrlPath = productExist.ImagePath;
+            IFormFile image = editProductsDTO.Image!;
 
-            var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
+            if (string.IsNullOrEmpty(image?.FileName) == false)
+            {
+                var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
 
-            string fileName = Guid.NewGuid().ToString() + extName;
-            string uploadDir = "uploads";
-            string physicalPath = $"wwwroot/{uploadDir}";
+                string fileName = Guid.NewGuid().ToString() + extName;
+                string uploadDir = "uploads";
+                string physicalPath = $"wwwroot/{uploadDir}";
 
-            var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
+                var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
 
-            using var stream = System.IO.File.OpenWrite(filePath);
-            await image.CopyToAsync(stream);
+                using var stream = System.IO.File.OpenWrite(filePath);
+                await image.CopyToAsync(stream);
 
-            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+                fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+
+                string fileExistName = productExist.ImagePath.Replace("https://localhost:7052/uploads/", "");
+                string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
+                
+                // remove image from server
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+            }
 
 
-            string res = _productService.ProductUpdate(Id, addProductsDTO, fileUrlPath);
+            string res = _productService.ProductUpdate(editProductsDTO.ProductID, editProductsDTO, fileUrlPath);
             if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
             }
-            return Ok("Success Update Product");
+
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Update Product"
+                }
+            );
         }
 
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("/products/Deactived")]
-        public ActionResult DeactivedProduct(int Id)
+        public ActionResult DeactivedProduct([FromBody] int Id)
         {
             string res = _productService.ProductUpdateStatus(Id, false);
             if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
             }
-            return Ok("SuccessFull Deactived");
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Deactiated Course"
+                }
+            );
         }
 
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("/products/Actived")]
-        public ActionResult ActivedProduct(int Id)
+        public ActionResult ActivedProduct([FromBody] int Id)
         {
             string res = _productService.ProductUpdateStatus(Id, true);
             if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res == null) ;
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
             }
-            return Ok("SuccessFull Deactived");
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Actiated Course"
+                }
+            );
         }
 
 
         [Authorize]
         //[Authorize(Roles = "admin")]
-        [HttpDelete("/products/{Id}")]
-        public ActionResult DeleteProduct(int Id)
+        [HttpDelete("/products")]
+        public ActionResult DeleteProduct([FromBody] int Id)
         {
             string res = _productService.ProductDelete(Id);
-            if(res != null)
+            if(string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
             }
-            return Ok("SuccessFull Delete");
+
+            return StatusCode(
+               (int)HttpStatusCode.OK,
+               new
+               {
+                   status = HttpStatusCode.OK,
+                   message = "SuccessFull Delete"
+               }
+           );
         }
 
         [HttpGet("/productsByCategory/{categoryName}")]

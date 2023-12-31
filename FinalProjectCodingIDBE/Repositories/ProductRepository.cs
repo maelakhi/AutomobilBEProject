@@ -21,7 +21,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false;";
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false ORDER BY created_at DESC;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -40,6 +40,43 @@ namespace FinalProjectCodingIDBE.Repositories
                         ImagePath = reader.GetString("image_path"),
                         CategoryName = reader.GetString("category_name")
                     }) ;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return products;
+        }
+        public List<ProductsResponseDTO> GetAllProductsActived()
+        {
+            List<ProductsResponseDTO> products = new List<ProductsResponseDTO>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false AND p.is_active = true;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    products.Add(new ProductsResponseDTO()
+                    {
+                        Id = reader.GetInt32("product_id"),
+                        Name = reader.GetString("product_name"),
+                        Description = reader.GetString("product_desc"),
+                        Price = reader.GetInt32("product_price"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        IdCategory = reader.GetInt32("id_category"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        ImagePath = reader.GetString("image_path"),
+                        CategoryName = reader.GetString("category_name")
+                    });
                 }
             }
             catch (Exception ex)
@@ -121,7 +158,7 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
-        public string UpdateProduct(int Id,AddProductsDTO productsDTO, string imageFilePath)
+        public string UpdateProduct(int Id, EditProductsDTO productsDTO, string imageFilePath)
         {
             string response = string.Empty;
             Products product = new Products();

@@ -17,6 +17,12 @@ namespace FinalProjectCodingIDBE.Services
             return products;
         }
 
+        public List<ProductsResponseDTO> GetAllProductsActived()
+        {
+            List<ProductsResponseDTO> products = _productsRepository.GetAllProductsActived();
+            return products;
+        }
+
         public ProductsResponseDTO GetByIdProducts(int Id)
         {
             ProductsResponseDTO product = _productsRepository.GetProductsById(Id);
@@ -29,7 +35,7 @@ namespace FinalProjectCodingIDBE.Services
             return product;
         }
 
-        public string ProductUpdate(int Id, AddProductsDTO productsDTO, string imageFilePath)
+        public string ProductUpdate(int Id, EditProductsDTO productsDTO, string imageFilePath)
         {
             string product = _productsRepository.UpdateProduct(Id,productsDTO,imageFilePath);
             return product;
