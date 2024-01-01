@@ -28,5 +28,13 @@ namespace FinalProjectCodingIDBE.Services
             return _repositoryInvoice.CreateInvoice(userId, idOrder);
         }
 
+        public List<InvoiceAdminResposeDTO> GetInvoiceAllAdmin()
+        {
+            return _repositoryInvoice.GetInvoiceAllAdmin();
+        }
+        public InvoiceDetailAdminResponse GetInvoiceByIdAdmin(int Id)
+        {
+            return _repositoryInvoice.GetInvoiceByIdAdmin(Id);
+        }
     }
 }

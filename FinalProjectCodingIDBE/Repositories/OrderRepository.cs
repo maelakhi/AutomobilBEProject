@@ -26,7 +26,6 @@ namespace FinalProjectCodingIDBE.Repositories
             try
             {
                 conn.Open();
-                MySqlTransaction transaction = conn.BeginTransaction();
                 
 
                 string sql = "SELECT * FROM order_header WHERE id_user = @idUser";
@@ -71,8 +70,6 @@ namespace FinalProjectCodingIDBE.Repositories
             try
             {
                 conn.Open();
-                MySqlTransaction transaction = conn.BeginTransaction();
-
 
                 string sql = "SELECT od.* FROM order_details od LEFT JOIN order_header oh ON oh.order_id = od.id_order WHERE oh.id_user = @idUser AND od.id_order = @idDetail";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
