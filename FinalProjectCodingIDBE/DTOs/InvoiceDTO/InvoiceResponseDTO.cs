@@ -1,14 +1,14 @@
 ﻿using FinalProjectCodingIDBE.DTOs.OrderDTO;
+using FinalProjectCodingIDBE.Models;
 
 namespace FinalProjectCodingIDBE.DTOs.InvoiceDTO
 {
     public class InvoiceResponseDTO
     {
         public int Id { get; set; }
-        public int IdOrder { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string createdAt { get; set; } = string.Empty;
-        public string updatedAt { get; set; } = string.Empty;
-        public OrderResponseDTO? OrderResponse { get; set; }
+        public int IdUser { get; set; }
+        public int TotalAmount { get; set; }
+        public string CreatedAt { get; set; } = string.Empty;
+        public List<OrderDetailsInvoice>? OrderDetails { get; set; }
     }
 }

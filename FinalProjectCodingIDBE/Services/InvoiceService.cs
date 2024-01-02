@@ -18,9 +18,9 @@ namespace FinalProjectCodingIDBE.Services
             return _repositoryInvoice.GetInvoiceAll(userId);
         }
 
-        public InvoiceResponseDTO GetInvoiceById(int userId, int idInvoice)
+        public InvoiceResponseDTO GetInvoiceById(int idInvoice)
         {
-            return _repositoryInvoice.GetInvoiceById(userId, idInvoice);
+            return _repositoryInvoice.GetInvoiceById(idInvoice);
         }
 
         public string CreateInvoice(int userId, int idOrder)

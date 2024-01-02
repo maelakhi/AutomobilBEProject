@@ -30,7 +30,7 @@ namespace FinalProjectCodingIDBE.Controllers
         public ActionResult GetById(int idInvoice)
         {
             int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
-            return Ok(_invoiceService.GetInvoiceById(userId, idInvoice));
+            return Ok(_invoiceService.GetInvoiceById(idInvoice));
         }
 
         [Authorize]

@@ -59,42 +59,37 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return invoiceList;
         }
-        public InvoiceResponseDTO GetInvoiceById(int userId, int idInvoice)
+        public InvoiceResponseDTO GetInvoiceById(int Id)
         {
-            InvoiceResponseDTO invoice = new InvoiceResponseDTO();
-            MySqlConnection conn = new MySqlConnection(_connectionString);
+            InvoiceResponseDTO orders = new InvoiceResponseDTO();
 
+            MySqlConnection conn = new MySqlConnection(_connectionString);
             try
             {
                 conn.Open();
 
-                string sql = "SELECT * FROM invoices inv LEFT JOIN order_header oh ON inv.id_order = oh.order_id WHERE oh.id_user = @idUser AND inv.invoice_id =@idInvoice";
+                string sql = "SELECT inv.invoice_id, oh.id_user, oh.total_amount, inv.created_at, oh.order_id FROM invoices inv LEFT JOIN order_header oh ON inv.id_order = oh.order_id WHERE inv.invoice_id = @idInvoice;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@idUser", userId);
-                cmd.Parameters.AddWithValue("@idInvoice", idInvoice);
+                cmd.Parameters.AddWithValue("@idInvoice", Id);
                 MySqlDataReader reader = cmd.ExecuteReader();
-
 
                 while (reader.Read())
                 {
-                    invoice.Id = reader.GetInt32("invoice_id");
-                    invoice.IdOrder = reader.GetInt32("id_order");
-                    invoice.Status = reader.GetString("status");
-                    invoice.createdAt = reader.GetString("created_at");
-                    invoice.updatedAt = reader.GetString("updated_at");
+                    orders.Id = reader.GetInt32("invoice_id");
+                    orders.IdUser = reader.GetInt32("id_user");
+                    orders.TotalAmount = reader.GetInt32("total_amount");
+                    orders.CreatedAt = reader.GetString("created_at");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-
             conn.Close();
 
-            OrderResponseDTO orderResponseDTO = _orderRepository.GetByIdOrders(userId, invoice.IdOrder);
-            invoice.OrderResponse = orderResponseDTO;
-
-            return invoice;
+            /*Fill order detail*/
+            orders.OrderDetails = GetAllOrderDetailsInvoice(orders.IdUser, orders.Id);
+            return orders;
         }
 
         public string CreateInvoice(int userId, int idOrder)
