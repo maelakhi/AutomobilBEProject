@@ -1,12 +1,14 @@
 ﻿using FinalProjectCodingIDBE.Dto.Auth;
 using FinalProjectCodingIDBE.DTOs.AuthDTO;
 using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Helpers;
 using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -374,10 +376,10 @@ namespace FinalProjectCodingIDBE.Controllers
                     );
         }
 
-
+        //admin
         [Authorize(Roles = "admin")]
         [HttpGet("/users")]
-        public ActionResult Register()
+        public ActionResult GetAllUser()
         {
             List<UserResponseDTO> userList = _userService.GetUserAll();
 
@@ -395,6 +397,257 @@ namespace FinalProjectCodingIDBE.Controllers
 
             return Ok(userList);
 
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost("/admin/Register")]
+        public ActionResult RegisterAdmin([FromBody] AddUserAdminDTO data)
+        {
+            /*Validasi Password*/
+            string validationPass = ValidationHelper.ValidationPassword(data.Password);
+            if (!string.IsNullOrEmpty(validationPass))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPass
+                        }
+                    );
+            }
+
+            /*Validasi Confirm Password*/
+            string validationPassCon = ValidationHelper.ValidationConfirmPassword(data.Password, data.ConfirmPassword);
+            if (!string.IsNullOrEmpty(validationPassCon))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = validationPassCon
+                        }
+                    );
+            }
+
+            Users? userExist = _userService.GetByEmail(data.Email);
+
+            if (userExist != null)
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Email sudah terdaftar"
+                        }
+                    );
+            }
+
+            string hashedPassword = PasswordHelper.HashPassword(data.Password);
+            string verificationToken = Guid.NewGuid().ToString();
+
+            data.Password = hashedPassword;
+
+            string res = _userService.CreateAccountAdmin(data);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Create Account Failed!"
+                        }
+                    );
+            }
+
+          /*  string htmlEmail = $@"
+                                Hello <b>{data.Email}</b>, please click link below to verify<br/>
+                                <a href='http://localhost:5173/confirmationEmail/{verificationToken}'>
+                                    <button>Verify My Account</botton>
+                                </a>
+                                ";
+
+            await MailHelper.Send("Dear User", data.Email, "Email Verification", htmlEmail);*/
+
+
+            return StatusCode(
+                        (int)HttpStatusCode.OK,
+                        new
+                        {
+                            status = HttpStatusCode.OK,
+                            message = "Create Account Successfull!"
+                        }
+                    );
+
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("/users")]
+        public ActionResult UpdatedUser([FromBody] EditUserAdminDTO  editUserDTO)
+        {
+            UserAdminResponseDTO userExist = _userService.GetUserById(editUserDTO.Id);
+
+            if(string.IsNullOrEmpty(editUserDTO.Password) == false)
+            {
+                /*Validasi Password*/
+                string validationPass = ValidationHelper.ValidationPassword(editUserDTO.Password);
+                if (!string.IsNullOrEmpty(validationPass))
+                {
+                    return StatusCode(
+                            (int)HttpStatusCode.Accepted,
+                            new
+                            {
+                                status = HttpStatusCode.Accepted,
+                                message = validationPass
+                            }
+                        );
+                }
+
+                /*Validasi Confirm Password*/
+                string validationPassCon = ValidationHelper.ValidationConfirmPassword(editUserDTO.Password, editUserDTO.ConfirmPassword);
+                if (!string.IsNullOrEmpty(validationPassCon))
+                {
+                    return StatusCode(
+                            (int)HttpStatusCode.Accepted,
+                            new
+                            {
+                                status = HttpStatusCode.Accepted,
+                                message = validationPassCon
+                            }
+                        );
+                }
+
+            }
+
+            editUserDTO.Password = (string.IsNullOrEmpty(editUserDTO.Password) == true) ? userExist.Password : PasswordHelper.HashPassword(editUserDTO.Password);
+
+
+            string res = _userService.UserUpdate(editUserDTO);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Update Product"
+                }
+            );
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("/users/{Id}")]
+        public ActionResult GetAllUser(int Id)
+        {
+            UserAdminResponseDTO userList = _userService.GetUserById(Id);
+
+            if (userList == null)
+            {
+                StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Data tidak ada"
+                        }
+                    );
+            }
+
+            return Ok(userList);
+
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("/user/Deactived")]
+        public ActionResult DeactivedProduct([FromBody] int Id)
+        {
+            string res = _userService.UserUpdateStatus(Id, false);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Deactiated Course"
+                }
+            );
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("/user/Actived")]
+        public ActionResult ActivedProduct([FromBody] int Id)
+        {
+            string res = _userService.UserUpdateStatus(Id, true);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Actiated Course"
+                }
+            );
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpDelete("/user")]
+        public ActionResult DeleteProduct([FromBody] int Id)
+        {
+            string res = _userService.UserDelete(Id);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+
+            return StatusCode(
+               (int)HttpStatusCode.OK,
+               new
+               {
+                   status = HttpStatusCode.OK,
+                   message = "SuccessFull Delete"
+               }
+           );
         }
 
         [Authorize(Roles = "admin")]

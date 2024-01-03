@@ -1,6 +1,7 @@
 ﻿using FinalProjectCodingIDBE.Dto.Auth;
 using FinalProjectCodingIDBE.DTOs.AuthDTO;
 using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Helpers;
 using FinalProjectCodingIDBE.Models;
@@ -17,42 +18,7 @@ namespace FinalProjectCodingIDBE.Repositories
         {
             _connectionString = configuration.GetConnectionString("Default");
         }
-        public List<UserResponseDTO> GetUserAll()
-        {
-            List<UserResponseDTO> userList = new List<UserResponseDTO>();
-
-            //get connection to database
-            MySqlConnection conn = new MySqlConnection(_connectionString);
-            try
-            {
-                conn.Open();
-                // able to query after open
-                // Perform database operations
-                MySqlCommand cmd = new MySqlCommand("SELECT user_id, user_email, role_user, user_name FROM users ", conn);
-
-                MySqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    userList.Add(new UserResponseDTO()
-                    { 
-                        Id = reader.GetInt32("user_id"),
-                        Email = reader.GetString("user_email"),
-                        Role = reader.GetString("role_user"),
-                        Name = reader.GetString("user_name")
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            //required
-            conn.Close();
-
-            return userList;
-        }
-
+ 
         public Users? GetByEmailAndPassword(LoginDto data)
         {
             Users? user = null;
@@ -304,6 +270,220 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
+
+        //admin
+        public List<UserResponseDTO> GetUserAll()
+        {
+            List<UserResponseDTO> userList = new List<UserResponseDTO>();
+
+            //get connection to database
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+                // able to query after open
+                // Perform database operations
+                MySqlCommand cmd = new MySqlCommand(
+                    "SELECT user_id, user_email, role_user, user_name, is_active FROM users WHERE is_delete = false", 
+                    conn
+                );
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    userList.Add(new UserResponseDTO()
+                    {
+                        Id = reader.GetInt32("user_id"),
+                        Email = reader.GetString("user_email"),
+                        Role = reader.GetString("role_user"),
+                        Name = reader.GetString("user_name"),
+                        IsActive = reader.GetBoolean("is_active")
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            //required
+            conn.Close();
+
+            return userList;
+        }
+
+        public string UserUpdateStatus(int Id, bool Status)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            UserAdminResponseDTO userDTOResponse = GetUserById(Id);
+
+            if (userDTOResponse.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE users SET is_active=@isActive WHERE user_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isActive", Status);
+                cmd.Parameters.AddWithValue("@Id", Id);
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
+                {
+                    return "Updated Failed";
+                };
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
+        public UserAdminResponseDTO GetUserById(int Id)
+        {
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            UserAdminResponseDTO userResponseDTO = new UserAdminResponseDTO();
+
+            try
+            {
+                conn.Open();
+                string sql = "SELECT user_id, user_email, role_user, user_name, is_active, user_password FROM users where user_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);;
+                cmd.Parameters.AddWithValue("@Id", Id);
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    userResponseDTO.Id = reader.GetInt32("user_id");
+                    userResponseDTO.Email = reader.GetString("user_email");
+                    userResponseDTO.Role = reader.GetString("role_user");
+                    userResponseDTO.Name = reader.GetString("user_name");
+                    userResponseDTO.IsActive = reader.GetBoolean("is_active");
+                    userResponseDTO.Password = reader.GetString("user_password");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return userResponseDTO;
+        }
+
+        public string CreateAccountAdmin(AddUserAdminDTO data)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            DateTime now = DateTime.Now;
+
+            try
+            {
+                conn.Open();
+
+                string sql = "INSERT INTO users (user_id, user_email, user_password, user_name, created_at, updated_at, is_active, is_delete, role_user, is_verified) VALUES (@userID, @userEmail, @userPass, @userName, @createdAt, @updatedAt, @isActive, @isDeleted, @Role, @isVerified)";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@userID", null);
+                cmd.Parameters.AddWithValue("@userEmail", data.Email);
+                cmd.Parameters.AddWithValue("@userPass", data.Password);
+                cmd.Parameters.AddWithValue("@userName", data.Name);
+                cmd.Parameters.AddWithValue("@createdAt", now);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isActive", true);
+                cmd.Parameters.AddWithValue("@isDeleted", false);
+                cmd.Parameters.AddWithValue("@Role", data.Role);
+                cmd.Parameters.AddWithValue("@@isVerified", true);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
+        public string UpdateUser(EditUserAdminDTO editUserAdminDTO)
+        {
+            string response = string.Empty;
+            Products product = new Products();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            DateTime now = DateTime.Now;
+            UserAdminResponseDTO userAdminResponseDTO = GetUserById(editUserAdminDTO.Id);
+
+            if (userAdminResponseDTO.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                string sql = "UPDATE Users SET user_name=@userName, user_email=@userEmail, user_password=@userPassword, updated_at=@updatedAt, role_user=@isRole WHERE user_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@userName", editUserAdminDTO.Name);
+                cmd.Parameters.AddWithValue("@userEmail", editUserAdminDTO.Email);
+                cmd.Parameters.AddWithValue("@userPassword", editUserAdminDTO.Password);
+                cmd.Parameters.AddWithValue("@isRole", editUserAdminDTO.Role);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@Id", editUserAdminDTO.Id);
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+        public string DeleteUser(int Id)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            UserAdminResponseDTO userResponseDTO = GetUserById(Id);
+
+            if (userResponseDTO.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE users SET is_delete=@isDelete WHERE user_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isDelete", true);
+                cmd.Parameters.AddWithValue("@Id", Id);
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
+                {
+                    response = "Updated Failed";
+                };
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
 
         public List<ChartUsers> GetDashboardUsers()
         {
