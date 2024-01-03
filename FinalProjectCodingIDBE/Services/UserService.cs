@@ -15,11 +15,6 @@ namespace FinalProjectCodingIDBE.Services
             _userRepository = userRepository;
         }
 
-        public List<UserResponseDTO> GetUserAll()
-        {
-            return _userRepository.GetUserAll();
-        }
-
         public Users? GetByEmail(string email)
         {
             return _userRepository.GetByEmail(email);
@@ -55,6 +50,38 @@ namespace FinalProjectCodingIDBE.Services
         public string SetNewPassword(CreateNewPasswordDTO data,int Id)
         {
             return _userRepository.SetNewPassword(data, Id);
+        }
+
+        // admin
+        public List<UserResponseDTO> GetUserAll()
+        {
+            return _userRepository.GetUserAll();
+        }
+
+        public UserAdminResponseDTO GetUserById(int Id)
+        {
+            return _userRepository.GetUserById(Id);
+        }
+
+        public string UserUpdateStatus(int Id, bool Status)
+        {
+            string product = _userRepository.UserUpdateStatus(Id, Status);
+            return product;
+        }
+        public string UserUpdate(EditUserAdminDTO editUserAdminDTO)
+        {
+            string flagDelete = _userRepository.UpdateUser(editUserAdminDTO);
+            return flagDelete;
+        }
+        public string UserDelete(int Id)
+        {
+            string flagDelete = _userRepository.DeleteUser(Id);
+            return flagDelete;
+        }
+
+        public string CreateAccountAdmin(AddUserAdminDTO data)
+        {
+            return _userRepository.CreateAccountAdmin(data);
         }
 
         public List<ChartUsers> GetDashboardUsers()

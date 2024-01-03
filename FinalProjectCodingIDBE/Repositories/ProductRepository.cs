@@ -130,6 +130,7 @@ namespace FinalProjectCodingIDBE.Repositories
         {
             ProductsResponseDTO product = new ProductsResponseDTO();
             MySqlConnection conn = new MySqlConnection(_connectionString);
+
             try
             {
                 conn.Open();
@@ -310,8 +311,6 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
-
-
 
         /*Landing page*/
         public List<ProductsResponseDTO> GetProductsLimit()
