@@ -1,5 +1,6 @@
 ﻿using FinalProjectCodingIDBE.Dto.Auth;
 using FinalProjectCodingIDBE.DTOs.AuthDTO;
+using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
 using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Helpers;
 using FinalProjectCodingIDBE.Models;
@@ -303,5 +304,45 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
+
+        public List<ChartUsers> GetDashboardUsers()
+        {
+            List<ChartUsers> userList = new List<ChartUsers>();
+
+            //get connection to database
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+
+            try
+            {
+                conn.Open();
+                // able to query after open
+                // Perform database operations
+                MySqlCommand cmd = new MySqlCommand(
+                    "SELECT COUNT(user_id) AS total_per_status, is_active FROM users GROUP BY is_active", 
+                    conn
+                 );
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    userList.Add(new ChartUsers()
+                    {
+                        TotalUsers = reader.GetInt32("total_per_status"),
+                        StatusUser = reader.GetString("is_active"),
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            //required
+            conn.Close();
+
+            return userList;
+        }
+
+
     }
 }

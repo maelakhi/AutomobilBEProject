@@ -198,9 +198,7 @@ namespace FinalProjectCodingIDBE.Controllers
             );
         }
 
-
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("/products")]
         public ActionResult DeleteProduct([FromBody] int Id)
         {
@@ -238,5 +236,22 @@ namespace FinalProjectCodingIDBE.Controllers
          {
             return Ok(_productService.GetByCategoryProductsId(Id));
          }
+
+
+        //dashboard
+        [Authorize(Roles = "admin")]
+        [HttpGet("/admin/productsDashboard")]
+        public ActionResult GetDashboardCategory()
+        {
+            return StatusCode(
+               (int)HttpStatusCode.OK,
+               new
+               {
+                   status = HttpStatusCode.OK,
+                   message = "SuccessFully Get Data",
+                   data = _productService.GetDashboardCategory()
+               }
+           );
+        }
     }
 }

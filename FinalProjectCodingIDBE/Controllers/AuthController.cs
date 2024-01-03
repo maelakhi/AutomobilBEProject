@@ -1,10 +1,12 @@
 ﻿using FinalProjectCodingIDBE.Dto.Auth;
 using FinalProjectCodingIDBE.DTOs.AuthDTO;
+using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
 using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Helpers;
 using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
 using FinalProjectCodingIDBE.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -372,6 +374,8 @@ namespace FinalProjectCodingIDBE.Controllers
                     );
         }
 
+
+        [Authorize(Roles = "admin")]
         [HttpGet("/users")]
         public ActionResult Register()
         {
@@ -393,5 +397,34 @@ namespace FinalProjectCodingIDBE.Controllers
 
         }
 
+        [Authorize(Roles = "admin")]
+        [HttpGet("/admin/usersDashboard")]
+        public ActionResult GetDashboardUsers()
+        {
+            List<ChartUsers> userList = _userService.GetDashboardUsers();
+
+            if (userList.Count <= 0)
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Data tidak ada"
+                        }
+                    );
+            }
+
+            return StatusCode(
+                        (int)HttpStatusCode.OK,
+                        new
+                        {
+                            status = HttpStatusCode.OK,
+                            message = "Successfully Get Data",
+                            data = userList
+                        }
+                    );
+
+        }
     }
 }
