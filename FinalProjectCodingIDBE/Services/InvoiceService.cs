@@ -13,14 +13,14 @@ namespace FinalProjectCodingIDBE.Services
             _repositoryInvoice = invoiceRepository;
         }
 
-        public List<Invoice> GetInvoiceAll(int userId)
+        public List<MenuInvoiceDTO> GetInvoiceAll(int userId)
         {
             return _repositoryInvoice.GetInvoiceAll(userId);
         }
 
-        public InvoiceResponseDTO GetInvoiceById(int userId, int idInvoice)
+        public InvoiceResponseDTO GetInvoiceById(int idInvoice)
         {
-            return _repositoryInvoice.GetInvoiceById(userId, idInvoice);
+            return _repositoryInvoice.GetInvoiceById(idInvoice);
         }
 
         public string CreateInvoice(int userId, int idOrder)
@@ -28,5 +28,13 @@ namespace FinalProjectCodingIDBE.Services
             return _repositoryInvoice.CreateInvoice(userId, idOrder);
         }
 
+        public List<InvoiceAdminResposeDTO> GetInvoiceAllAdmin()
+        {
+            return _repositoryInvoice.GetInvoiceAllAdmin();
+        }
+        public InvoiceDetailAdminResponse GetInvoiceByIdAdmin(int Id)
+        {
+            return _repositoryInvoice.GetInvoiceByIdAdmin(Id);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CategoryDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 using System.Data;
@@ -34,6 +35,7 @@ namespace FinalProjectCodingIDBE.Repositories
                         Description = reader.GetString("category_desc"),
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
+                        IsActive = reader.GetBoolean("is_active"),
                         ImagePath = image
                     });
                 }
@@ -67,6 +69,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     category.Description = reader.GetString("category_desc");
                     category.CreatedAt = reader.GetString("created_at");
                     category.UpdatedAt = reader.GetString("updated_at");
+                    category.IsActive = reader.GetBoolean("is_active");
                     category.ImagePath = image;
                 }
             }
@@ -163,7 +166,8 @@ namespace FinalProjectCodingIDBE.Repositories
             try
             {
                 conn.Open();
-                string sql = "UPDATE Category SET is_delete=@isDelete WHERE category_id = @Id";
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE category SET is_delete=@isDelete WHERE category_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@isDelete", true);
                 cmd.Parameters.AddWithValue("@Id", Id);
@@ -182,6 +186,7 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
+
 
         public List<Category> GetCategoryLimit()
         {
@@ -216,6 +221,41 @@ namespace FinalProjectCodingIDBE.Repositories
 
             conn.Close();
             return category;
+        }
+
+        public string UpdateStatusCategory(int Id, bool Status)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            Category category = GetCategoryById(Id);
+
+            if (category.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE category SET is_active=@isActive WHERE category_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isActive", Status);
+                cmd.Parameters.AddWithValue("@Id", Id);
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
+                {
+                    return "Updated Failed";
+                };
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
         }
     }
 }

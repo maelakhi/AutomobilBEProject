@@ -19,7 +19,7 @@ namespace FinalProjectCodingIDBE.Controllers
 
         [Authorize]
         [HttpGet("/invoice")]
-        public ActionResult GetAll()
+        public ActionResult GetAll()    
         {
             int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
             return Ok(_invoiceService.GetInvoiceAll(userId));
@@ -30,7 +30,7 @@ namespace FinalProjectCodingIDBE.Controllers
         public ActionResult GetById(int idInvoice)
         {
             int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
-            return Ok(_invoiceService.GetInvoiceById(userId, idInvoice));
+            return Ok(_invoiceService.GetInvoiceById(idInvoice));
         }
 
         [Authorize]
@@ -44,6 +44,21 @@ namespace FinalProjectCodingIDBE.Controllers
                 return BadRequest(res);
             }
             return Ok("Success Create Invoice");
+        }
+
+        
+        [HttpGet("/admin/invoice")]
+        [Authorize(Roles = "admin")]
+        public ActionResult GetAllAdmin()
+        {
+            return Ok(_invoiceService.GetInvoiceAllAdmin());
+        }
+
+        [HttpGet("/admin/invoice/{Id}")]
+        [Authorize(Roles = "admin")]
+        public ActionResult GetInvoiceByIdAdmin(int Id)
+        {
+            return Ok(_invoiceService.GetInvoiceByIdAdmin(Id));
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
+﻿using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
 
@@ -17,6 +18,12 @@ namespace FinalProjectCodingIDBE.Services
             return products;
         }
 
+        public List<ProductsResponseDTO> GetAllProductsActived()
+        {
+            List<ProductsResponseDTO> products = _productsRepository.GetAllProductsActived();
+            return products;
+        }
+
         public ProductsResponseDTO GetByIdProducts(int Id)
         {
             ProductsResponseDTO product = _productsRepository.GetProductsById(Id);
@@ -29,7 +36,7 @@ namespace FinalProjectCodingIDBE.Services
             return product;
         }
 
-        public string ProductUpdate(int Id, AddProductsDTO productsDTO, string imageFilePath)
+        public string ProductUpdate(int Id, EditProductsDTO productsDTO, string imageFilePath)
         {
             string product = _productsRepository.UpdateProduct(Id,productsDTO,imageFilePath);
             return product;
@@ -63,6 +70,11 @@ namespace FinalProjectCodingIDBE.Services
         public List<ProductsResponseDTO> GetByCategoryProductsId(int Id)
         {
             List<ProductsResponseDTO> products = _productsRepository.GetProductsByCategoryId(Id);
+            return products;
+        }
+        public List<ChartProductCategory> GetDashboardCategory()
+        {
+            List<ChartProductCategory> products = _productsRepository.GetDashboardCategory();
             return products;
         }
     }
