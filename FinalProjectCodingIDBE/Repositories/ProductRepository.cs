@@ -125,6 +125,43 @@ namespace FinalProjectCodingIDBE.Repositories
             return product;
         }
 
+        public ProductsResponseDTO InvoiceGetProductsById(int Id)
+        {
+            ProductsResponseDTO product = new ProductsResponseDTO();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.product_id = @idProduct;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@idProduct", Id);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+
+                while (reader.Read())
+                {
+                    product.Id = reader.GetInt32("product_id");
+                    product.Name = reader.GetString("product_name");
+                    product.Description = reader.GetString("product_desc");
+                    product.Price = reader.GetInt32("product_price");
+                    product.CreatedAt = reader.GetDateTime("created_at");
+                    product.UpdatedAt = reader.GetDateTime("updated_at");
+                    product.IdCategory = reader.GetInt32("id_category");
+                    product.ImagePath = reader.GetString("image_path");
+                    product.IsActive = reader.GetBoolean("is_active");
+                    product.CategoryName = reader.GetString("category_name");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return product;
+        }
+
         public string CreateProduct(AddProductsDTO productsDTO, string imageFilePath)
         {
             string response = string.Empty;

@@ -239,7 +239,7 @@ namespace FinalProjectCodingIDBE.Repositories
 
             foreach (var item in orderDetails)
             {
-                item.product = _productRepository.GetProductsById(item.IdProduct);
+                item.product = _productRepository.InvoiceGetProductsById(item.IdProduct);
             }
 
             return orderDetails;
