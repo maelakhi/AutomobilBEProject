@@ -1,4 +1,5 @@
-﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
+﻿using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
 
@@ -69,6 +70,11 @@ namespace FinalProjectCodingIDBE.Services
         public List<ProductsResponseDTO> GetByCategoryProductsId(int Id)
         {
             List<ProductsResponseDTO> products = _productsRepository.GetProductsByCategoryId(Id);
+            return products;
+        }
+        public List<ChartProductCategory> GetDashboardCategory()
+        {
+            List<ChartProductCategory> products = _productsRepository.GetDashboardCategory();
             return products;
         }
     }

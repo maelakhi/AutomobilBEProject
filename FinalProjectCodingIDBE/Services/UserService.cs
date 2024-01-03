@@ -1,5 +1,6 @@
 ﻿using FinalProjectCodingIDBE.Dto.Auth;
 using FinalProjectCodingIDBE.DTOs.AuthDTO;
+using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
 using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Repositories;
@@ -54,6 +55,11 @@ namespace FinalProjectCodingIDBE.Services
         public string SetNewPassword(CreateNewPasswordDTO data,int Id)
         {
             return _userRepository.SetNewPassword(data, Id);
+        }
+
+        public List<ChartUsers> GetDashboardUsers()
+        {
+            return _userRepository.GetDashboardUsers();
         }
 
     }

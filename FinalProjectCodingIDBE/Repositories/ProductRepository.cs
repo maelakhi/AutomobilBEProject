@@ -1,4 +1,5 @@
-﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
+﻿using FinalProjectCodingIDBE.DTOs.DashBoardDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 using System.Data;
@@ -430,5 +431,39 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return products;
         }
+
+        //Dashboard
+        public List<ChartProductCategory> GetDashboardCategory()
+        {
+            List<ChartProductCategory> products = new List<ChartProductCategory>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT COUNT(c.category_id) AS total_product, c.category_name FROM products p JOIN category c ON c.category_id = p.id_category GROUP BY c.category_id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    products.Add(new ChartProductCategory()
+                    {
+                       TotalProduct = reader.GetInt32("total_product"),
+                       CategoryName = reader.GetString("category_name")
+                    });;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return products;
+        }
+
+
     }
 }
