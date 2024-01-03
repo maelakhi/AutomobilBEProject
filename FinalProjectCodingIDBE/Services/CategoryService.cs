@@ -43,5 +43,12 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _CategorysRepository.GetCategoryLimit();
         }
+
+        public string CategoryStatus(int Id, bool Status)
+        {
+            string product = _CategorysRepository.UpdateStatusCategory(Id, Status);
+            return product;
+        }
+
     }
 }

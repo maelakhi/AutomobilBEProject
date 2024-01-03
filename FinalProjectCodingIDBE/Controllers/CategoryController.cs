@@ -4,6 +4,7 @@ using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Security.Claims;
 
 namespace FinalProjectCodingIDBE.Controllers
@@ -32,8 +33,7 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok(_CategoryService.GetByIdCategory(Id));
         }
 
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost("/category")]
         public async Task<ActionResult> CreateCategory([FromForm] AddCategoryDTO addCategoryDTO)
         {
@@ -61,8 +61,7 @@ namespace FinalProjectCodingIDBE.Controllers
             return Ok("Success Add Category");
         }
 
-        [Authorize]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("/category")]
         public async Task<ActionResult> UpdatedCategory([FromForm] AddCategoryDTO addCategoryDTO)
         {
@@ -90,24 +89,90 @@ namespace FinalProjectCodingIDBE.Controllers
             }
             return Ok("Success Update Category");
         }
-
-        [Authorize]
-        // [Authorize(Roles = "admin")]
-        [HttpDelete("/category/{Id}")]
-        public ActionResult DeleteCategory(int Id)
+        
+        [Authorize(Roles = "admin")]
+        [HttpDelete("/category")]
+        public ActionResult DeleteCategory([FromBody] int Id)
         {
             string res = _CategoryService.CategoryDelete(Id);
-            if (!string.IsNullOrEmpty(res))
+            if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
             }
-            return Ok("Successfull Delete");
+
+            return StatusCode(
+               (int)HttpStatusCode.OK,
+               new
+               {
+                   status = HttpStatusCode.OK,
+                   message = "SuccessFull Delete"
+               }
+           );
         }
 
         [HttpGet("/CategoryLimit")]
         public ActionResult GetCategoryLimit()
         {
             return Ok(_CategoryService.GetCategoryLimit());
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("/category/Deactived")]
+        public ActionResult DeactivateCategory([FromBody] int Id)
+        {
+            string res = _CategoryService.CategoryStatus(Id, false);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Deactivate Category"
+                }
+            );
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("/category/Actived")]
+        public ActionResult ActivateCategory([FromBody] int Id)
+        {
+            string res = _CategoryService.CategoryStatus(Id, true);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Activate a Category"
+                }
+            );
         }
 
     }
