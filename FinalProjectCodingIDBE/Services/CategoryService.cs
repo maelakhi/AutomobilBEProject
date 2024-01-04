@@ -28,7 +28,7 @@ namespace FinalProjectCodingIDBE.Services
             string category = _CategorysRepository.CreateCategory(categorysDTO, fileUrlPath);
             return category;
         }
-        public string CategoryUpdate(int Id, AddCategoryDTO categorysDTO, string fileUrlPath)
+        public string CategoryUpdate(int Id, EditCategoryDTO categorysDTO, string fileUrlPath)
         {
             string category = _CategorysRepository.UpdateCategory(Id, categorysDTO, fileUrlPath);
             return category;
@@ -46,8 +46,8 @@ namespace FinalProjectCodingIDBE.Services
 
         public string CategoryStatus(int Id, bool Status)
         {
-            string product = _CategorysRepository.UpdateStatusCategory(Id, Status);
-            return product;
+            string category = _CategorysRepository.UpdateStatusCategory(Id, Status);
+            return category;
         }
 
     }

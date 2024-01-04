@@ -1,5 +1,7 @@
 ﻿using FinalProjectCodingIDBE.DTOs.CategoryDTO;
+using FinalProjectCodingIDBE.DTOs.PaymentDTO;
 using FinalProjectCodingIDBE.DTOs.ProductDTO;
+using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -63,33 +65,62 @@ namespace FinalProjectCodingIDBE.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpPut("/category")]
-        public async Task<ActionResult> UpdatedCategory([FromForm] AddCategoryDTO addCategoryDTO)
+        public async Task<ActionResult> UpdatedCategory([FromForm] EditCategoryDTO categoryDTO)
         {
-            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
-            IFormFile image = addCategoryDTO.Image!;
+            Category categoryExist = _CategoryService.GetByIdCategory(categoryDTO.categoryID);
+            string fileUrlPath = categoryExist.ImagePath;
+            IFormFile image = categoryDTO.Image!;
 
-            var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
-
-            string fileName = Guid.NewGuid().ToString() + extName;
-            string uploadDir = "uploads";
-            string physicalPath = $"wwwroot/{uploadDir}";
-
-            var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
-
-            using var stream = System.IO.File.OpenWrite(filePath);
-            await image.CopyToAsync(stream);
-
-            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
-
-            string res = _CategoryService.CategoryUpdate(userId, addCategoryDTO, fileUrlPath);
-
-            if (!string.IsNullOrEmpty(res))
+            if (string.IsNullOrEmpty(image?.FileName) == false)
             {
-                return BadRequest(res);
+                var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
+
+                string fileName = Guid.NewGuid().ToString() + extName;
+                string uploadDir = "uploads";
+                string physicalPath = $"wwwroot/{uploadDir}";
+
+                var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
+
+                using var stream = System.IO.File.OpenWrite(filePath);
+                await image.CopyToAsync(stream);
+
+                fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+
+                string fileExistName = categoryExist.ImagePath.Replace("https://localhost:7052/uploads/", "");
+                string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
+
+                // remove image from server
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
             }
-            return Ok("Success Update Category");
+
+
+            string res = _CategoryService.CategoryUpdate(categoryDTO.categoryID, categoryDTO, fileUrlPath);
+            if (string.IsNullOrEmpty(res) == false)
+            {
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
+            }
+
+            return StatusCode(
+                (int)HttpStatusCode.OK,
+                new
+                {
+                    status = HttpStatusCode.OK,
+                    message = "Success Update Category"
+                }
+            );
         }
-        
+
         [Authorize(Roles = "admin")]
         [HttpDelete("/category")]
         public ActionResult DeleteCategory([FromBody] int Id)

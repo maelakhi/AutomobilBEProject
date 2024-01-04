@@ -1,6 +1,4 @@
-﻿using FinalProjectCodingIDBE.DTOs.CategoryDTO;
-using FinalProjectCodingIDBE.DTOs.PaymentDTO;
-using FinalProjectCodingIDBE.DTOs.ProductDTO;
+﻿using FinalProjectCodingIDBE.DTOs.PaymentDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 using System.Data;
@@ -116,7 +114,7 @@ namespace FinalProjectCodingIDBE.Repositories
             return response;
         }
 
-        public string UpdatePaymentMethod(int Id, AddPaymentDTO paymentDTO, string filePathUrl)
+        public string UpdatePaymentMethod(int Id, EditPaymentDTO paymentDTO, string filePathUrl)
         {
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -183,6 +181,41 @@ namespace FinalProjectCodingIDBE.Repositories
                 if (rowsAffected != 1)
                 {
                     response = "Updated Failed";
+                };
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
+        public string UpdateStatusPayment(int Id, bool Status)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            PaymentMethod payment = GetPaymentById(Id);
+
+            if (payment.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE payment_method SET is_active=@isActive WHERE payment_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isActive", Status);
+                cmd.Parameters.AddWithValue("@Id", Id);
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
+                {
+                    return "Updated Failed";
                 };
             }
             catch (Exception ex)
