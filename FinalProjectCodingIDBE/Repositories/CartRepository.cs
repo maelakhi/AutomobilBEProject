@@ -133,6 +133,39 @@ namespace FinalProjectCodingIDBE.Repositories
             return response;
         }
 
+        public string CartCreateBuyNow(AddCartDTO cartData)
+        {
+            DateTime now = DateTime.Now;
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+
+            try
+            {
+                conn.Open();
+
+                string sql = "INSERT INTO Carts (carts_id,id_product,id_user, date_schedule, created_at, updated_at, is_delete) VALUES (@cartsId,@productId,@idUser,@dateShcedule,@createdAt,@updatedAt,@isDelete)";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@cartsId", null);
+                cmd.Parameters.AddWithValue("@productId", cartData.IdProduct);
+                cmd.Parameters.AddWithValue("@idUser", cartData.IdUser);
+                cmd.Parameters.AddWithValue("@dateShcedule", cartData.DateSchedule);
+                cmd.Parameters.AddWithValue("@createdAt", now);
+                cmd.Parameters.AddWithValue("@updatedAt", now);
+                cmd.Parameters.AddWithValue("@isDelete", false);
+                cmd.ExecuteNonQuery();
+
+                response = cmd.LastInsertedId.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+
         public string DeleteCart(int userId, int idCart)
         {
             string response = string.Empty;
