@@ -52,7 +52,7 @@ namespace FinalProjectCodingIDBE.Controllers
                             new
                             {
                                status = HttpStatusCode.NotFound,
-                               message = "Token invalid"
+                               message = "Failed Add to Cart"
                             }
                        );
             }
@@ -63,6 +63,38 @@ namespace FinalProjectCodingIDBE.Controllers
                       {
                           status = HttpStatusCode.OK,
                           message = "Succesfuly Add To Cart"
+                      }
+                  );
+        }
+
+        [Authorize]
+        [HttpPost("/cartsBuyNow")]
+        public ActionResult AddToCartBuyNow([FromBody] AddCartDTO cartData)
+        {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.Sid));
+            cartData.IdUser = userId;
+
+            string res = _cartService.CartCreateBuyNow(cartData);
+
+            if (string.IsNullOrEmpty(res) == true)
+            {
+                return StatusCode(
+                         (int)HttpStatusCode.NotFound,
+                            new
+                            {
+                                status = HttpStatusCode.NotFound,
+                                message = "Failed Preaparing Order"
+                            }
+                       );
+            }
+
+            return StatusCode(
+                      (int)HttpStatusCode.OK,
+                      new
+                      {
+                          status = HttpStatusCode.OK,
+                          message = "Succesfuly Preaparing Order",
+                          data = res
                       }
                   );
         }
