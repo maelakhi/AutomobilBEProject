@@ -23,7 +23,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT * FROM payment_method WHERE is_active = true;";
+                string sql = "SELECT * FROM payment_method WHERE is_delete = false;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -36,7 +36,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         AccountNumber = reader.GetString("payment_number_account"),
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
-                        ImagePath = reader.GetString("image_path")
+                        ImagePath = reader.GetString("image_path"),
+                        IsActive = reader.GetBoolean("is_active")
                     }) ;
                 }
 
@@ -171,11 +172,9 @@ namespace FinalProjectCodingIDBE.Repositories
             try
             {
                 conn.Open();
-                string sql = "UPDATE payment_method SET is_delete=@isDelete, is_active=@isActive, updated_at=@deleteTime WHERE payment_id = @Id";
+                string sql = "UPDATE payment_method SET is_delete=@isDelete WHERE payment_id = @Id";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@isDelete", true);
-                cmd.Parameters.AddWithValue("@isActive", false);
-                cmd.Parameters.AddWithValue("@deleteTime", now);
                 cmd.Parameters.AddWithValue("@Id", Id);
                 var rowsAffected = cmd.ExecuteNonQuery();
                 if (rowsAffected != 1)

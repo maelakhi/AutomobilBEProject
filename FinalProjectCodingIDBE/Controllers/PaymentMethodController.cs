@@ -150,14 +150,29 @@ namespace FinalProjectCodingIDBE.Controllers
         [Authorize]
         /*[Authorize(Roles = "admin")]*/
         [HttpDelete("/paymentMethod")]
-        public ActionResult DeletePayment(int Id)
+        public ActionResult DeletePayment([FromBody] int Id)
         {
             string res = _paymentService.DeletePayment(Id);
-            if (!string.IsNullOrEmpty(res))
+            if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                   (int)HttpStatusCode.BadRequest,
+                   new
+                   {
+                       status = HttpStatusCode.BadRequest,
+                       message = res
+                   }
+               );
             }
-            return Ok("SuccessFull Delete");
+
+            return StatusCode(
+               (int)HttpStatusCode.OK,
+               new
+               {
+                   status = HttpStatusCode.OK,
+                   message = "SuccessFull Delete"
+               }
+           );
         }
 
         [Authorize(Roles = "admin")]
