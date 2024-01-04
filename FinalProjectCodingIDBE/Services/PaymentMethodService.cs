@@ -27,7 +27,7 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _paymentMethodRepository.AddPaymentMethod(payment, fileUrlPath);
         }
-        public string UpdatePayment(int Id, AddPaymentDTO payment, string filePathUrl)
+        public string UpdatePayment(int Id, EditPaymentDTO payment, string filePathUrl)
         {
             return _paymentMethodRepository.UpdatePaymentMethod(Id, payment, filePathUrl);
         }
@@ -36,5 +36,10 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _paymentMethodRepository.DeletePaymentMethod(Id);
         }
+        public string PaymentStatus(int Id, bool Status)
+        {
+            return _paymentMethodRepository.UpdateStatusPayment(Id, Status);
+        }
+
     }
 }

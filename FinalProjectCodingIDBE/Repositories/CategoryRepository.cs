@@ -113,7 +113,7 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
-        public string UpdateCategory(int Id, AddCategoryDTO categoryDTO, string fileUrlPath)
+        public string UpdateCategory(int Id, EditCategoryDTO categoryDTO, string fileUrlPath)
         {
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
