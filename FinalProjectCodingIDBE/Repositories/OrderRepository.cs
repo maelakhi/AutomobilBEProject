@@ -39,8 +39,14 @@ namespace FinalProjectCodingIDBE.Repositories
                         IdUser = reader.GetInt32("id_user"),
                         IdPayment = reader.GetInt32("id_payment"),
                         StatusPayment = reader.GetString("status_payment"),
+<<<<<<< Updated upstream
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at")
+=======
+                        TotalAmount = reader.GetInt32("total_amount"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+>>>>>>> Stashed changes
                     });
                 }                
             }
@@ -86,8 +92,14 @@ namespace FinalProjectCodingIDBE.Repositories
                         Quantity = reader.GetInt32("quantity"),
                         AmountProduct = reader.GetInt32("amount_product"),
                         TotalAmount = reader.GetInt32("total_amount"),
+<<<<<<< Updated upstream
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at")
+=======
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        DateSchedule = reader.GetString("date_schedule")
+>>>>>>> Stashed changes
                     });
                 }
 
@@ -122,8 +134,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     order.IdPayment = reader.GetInt32("id_payment");
                     order.StatusPayment = reader.GetString("status_paymnet");
                     order.TotalAmount = reader.GetInt32("total_amount");
-                    order.CreatedAt = reader.GetString("created_at");
-                    order.UpdatedAt = reader.GetString("updated_at");
+                    order.CreatedAt = reader.GetDateTime("created_at");
+                    order.UpdatedAt = reader.GetDateTime("updated_at");
                 }
             }
             catch (Exception ex)

@@ -32,8 +32,14 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("category_id"),
                         Name = reader.GetString("category_name"),
                         Description = reader.GetString("category_desc"),
+<<<<<<< Updated upstream
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at"),
+=======
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        IsActive = reader.GetBoolean("is_active"),
+>>>>>>> Stashed changes
                         ImagePath = image
                     });
                 }
@@ -65,8 +71,14 @@ namespace FinalProjectCodingIDBE.Repositories
                     category.Id = reader.GetInt32("category_id");
                     category.Name = reader.GetString("category_name");
                     category.Description = reader.GetString("category_desc");
+<<<<<<< Updated upstream
                     category.CreatedAt = reader.GetString("created_at");
                     category.UpdatedAt = reader.GetString("updated_at");
+=======
+                    category.CreatedAt = reader.GetDateTime("created_at");
+                    category.UpdatedAt = reader.GetDateTime("updated_at");
+                    category.IsActive = reader.GetBoolean("is_active");
+>>>>>>> Stashed changes
                     category.ImagePath = image;
                 }
             }
@@ -183,5 +195,79 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
+<<<<<<< Updated upstream
+=======
+
+
+        public List<Category> GetCategoryLimit()
+        {
+            List<Category> category = new List<Category>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT * FROM Category WHERE is_delete = false LIMIT 8;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
+                    category.Add(new Category()
+                    {
+                        Id = reader.GetInt32("category_id"),
+                        Name = reader.GetString("category_name"),
+                        Description = reader.GetString("category_desc"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        ImagePath = image
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return category;
+        }
+
+        public string UpdateStatusCategory(int Id, bool Status)
+        {
+            string response = string.Empty;
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            Category category = GetCategoryById(Id);
+
+            if (category.Id == 0)
+            {
+                return "Data tidak ditemukan";
+            }
+
+            try
+            {
+                conn.Open();
+                /*string sql = "DELETE FROM Products WHERE product_id = @Id";*/
+                string sql = "UPDATE category SET is_active=@isActive WHERE category_id = @Id";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@isActive", Status);
+                cmd.Parameters.AddWithValue("@Id", Id);
+                var rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected != 1)
+                {
+                    return "Updated Failed";
+                };
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return response;
+        }
+>>>>>>> Stashed changes
     }
 }

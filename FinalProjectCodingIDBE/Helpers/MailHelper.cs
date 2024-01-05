@@ -29,11 +29,15 @@ namespace FinalProjectCodingIDBE.Helpers
             using (var smtp = new SmtpClient())
             {
                 await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                 await smtp.AuthenticateAsync("email", "privatekey");
 =======
                 await smtp.AuthenticateAsync("developprz@gmail.com", "fuhqhzmgnhyibdpm");
 >>>>>>> 77c76d26b340fa585978c75e6a737d304862f1ac
+=======
+                await smtp.AuthenticateAsync("maeljoshua882@gmail.com", "dygrgjjzcauebrzl");
+>>>>>>> Stashed changes
                 await smtp.SendAsync(message);
                 await smtp.DisconnectAsync(true);
             }

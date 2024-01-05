@@ -7,7 +7,7 @@ namespace FinalProjectCodingIDBE.Models
         public int Id { get; set; }
         public int IdOrder { get; set; }
         public string Status { get; set; } = string.Empty;
-        public string createdAt { get; set; } = string.Empty;
-        public string updatedAt { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

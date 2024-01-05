@@ -7,8 +7,8 @@
         public string Description { get; set;} = string.Empty; 
         public int Price { get; set;}
         public string ImagePath { get; set; } = string.Empty;
-        public string CreatedAt { get; set; } = string.Empty;
-        public string UpdatedAt { get; set;} = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set;}
         public int IdCategory { get; set; }
         public bool IsActive { get; set; } 
     }

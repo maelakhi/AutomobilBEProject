@@ -35,9 +35,17 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("payment_id"),
                         Name = reader.GetString("payment_name"),
                         AccountNumber = reader.GetString("payment_number_account"),
+<<<<<<< Updated upstream
                         CreatedAt = reader.GetString("created_at"),
                         UpdatedAt = reader.GetString("updated_at")
                     });
+=======
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        ImagePath = reader.GetString("image_path"),
+                        IsActive = reader.GetBoolean("is_active")
+                    }) ;
+>>>>>>> Stashed changes
                 }
 
             }catch (Exception ex)
@@ -57,7 +65,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = $"SELECT * FROM payment_method WHERE is_active = true AND payment_id = {Id};";
+                string sql = $"SELECT * FROM payment_method WHERE payment_id = {Id};";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -66,8 +74,14 @@ namespace FinalProjectCodingIDBE.Repositories
                     payment.Id = reader.GetInt32("payment_id");
                     payment.Name = reader.GetString("payment_name");
                     payment.AccountNumber = reader.GetString("payment_number_account");
+<<<<<<< Updated upstream
                     payment.CreatedAt = reader.GetString("created_at");
                     payment.UpdatedAt = reader.GetString("updated_at");
+=======
+                    payment.CreatedAt = reader.GetDateTime("created_at");
+                    payment.UpdatedAt = reader.GetDateTime("updated_at");
+                    payment.ImagePath = reader.GetString("image_path");
+>>>>>>> Stashed changes
                 }
 
             }
