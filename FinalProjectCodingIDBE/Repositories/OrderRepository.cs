@@ -42,8 +42,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         IdPayment = reader.GetInt32("id_payment"),
                         StatusPayment = reader.GetString("status_payment"),
                         TotalAmount = reader.GetInt32("total_amount"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                     });
                 }                
             }
@@ -87,8 +87,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Quantity = reader.GetInt32("quantity"),
                         AmountProduct = reader.GetInt32("amount_product"),
                         TotalAmount = reader.GetInt32("total_amount"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         DateSchedule = reader.GetString("date_schedule")
                     });
                 }
@@ -124,8 +124,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     order.IdPayment = reader.GetInt32("id_payment");
                     order.StatusPayment = reader.GetString("status_payment");
                     order.TotalAmount = reader.GetInt32("total_amount");
-                    order.CreatedAt = reader.GetString("created_at");
-                    order.UpdatedAt = reader.GetString("updated_at");
+                    order.CreatedAt = reader.GetDateTime("created_at");
+                    order.UpdatedAt = reader.GetDateTime("updated_at");
                 }
             }
             catch (Exception ex)

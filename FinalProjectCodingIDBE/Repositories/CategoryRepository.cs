@@ -33,8 +33,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("category_id"),
                         Name = reader.GetString("category_name"),
                         Description = reader.GetString("category_desc"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = image
                     });
@@ -67,8 +67,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     category.Id = reader.GetInt32("category_id");
                     category.Name = reader.GetString("category_name");
                     category.Description = reader.GetString("category_desc");
-                    category.CreatedAt = reader.GetString("created_at");
-                    category.UpdatedAt = reader.GetString("updated_at");
+                    category.CreatedAt = reader.GetDateTime("created_at");
+                    category.UpdatedAt = reader.GetDateTime("updated_at");
                     category.IsActive = reader.GetBoolean("is_active");
                     category.ImagePath = image;
                 }
@@ -208,8 +208,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("category_id"),
                         Name = reader.GetString("category_name"),
                         Description = reader.GetString("category_desc"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         ImagePath = image
                     });
                 }

@@ -45,7 +45,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     invoiceList.Add(new MenuInvoiceDTO()
                     {
                         Id = reader.GetInt32("invoice_id"),
-                        createdAt = reader.GetString("created_at"),
+                        createdAt = reader.GetDateTime("created_at"),
                         totalCourse = reader.GetInt32("total_course"),
                         totalPrice = reader.GetInt32("total_price"),
                     });
@@ -78,7 +78,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     orders.Id = reader.GetInt32("invoice_id");
                     orders.IdUser = reader.GetInt32("id_user");
                     orders.TotalAmount = reader.GetInt32("total_amount");
-                    orders.CreatedAt = reader.GetString("created_at");
+                    orders.CreatedAt = reader.GetDateTime("created_at");
                 }
             }
             catch (Exception ex)
@@ -186,7 +186,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     orders.IdPayment = reader.GetInt32("id_payment");
                     orders.StatusPayment = reader.GetString("status_payment");
                     orders.TotalAmount = reader.GetInt32("total_amount");
-                    orders.CreatedAt = reader.GetString("created_at");
+                    orders.CreatedAt = reader.GetDateTime("created_at");
                 }                
             }
             catch (Exception ex)
