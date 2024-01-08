@@ -23,7 +23,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT * FROM payment_method WHERE is_delete = false;";
+                string sql = "SELECT * FROM payment_method WHERE is_active = true;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -39,6 +39,43 @@ namespace FinalProjectCodingIDBE.Repositories
                         ImagePath = reader.GetString("image_path"),
                         IsActive = reader.GetBoolean("is_active")
                     }) ;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            conn.Close();
+
+            return paymentList;
+        }
+
+        public List<PaymentMethod> GetPaymentListAdmin()
+        {
+            List<PaymentMethod> paymentList = new List<PaymentMethod>();
+
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT * FROM payment_method WHERE is_delete = false;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    paymentList.Add(new PaymentMethod()
+                    {
+                        Id = reader.GetInt32("payment_id"),
+                        Name = reader.GetString("payment_name"),
+                        AccountNumber = reader.GetString("payment_number_account"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        ImagePath = reader.GetString("image_path"),
+                        IsActive = reader.GetBoolean("is_active")
+                    });
                 }
 
             }

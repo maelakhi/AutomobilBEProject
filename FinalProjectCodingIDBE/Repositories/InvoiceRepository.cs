@@ -14,17 +14,20 @@ namespace FinalProjectCodingIDBE.Repositories
         private readonly OrderRepository _orderRepository;
         private readonly ProductRepository _productRepository;
         private readonly PaymentMethodRepository _paymentMethodRepository;
+        private readonly UserRepository _userRepository;
         public InvoiceRepository(
             IConfiguration configuration, 
             OrderRepository orderRepository, 
             ProductRepository productRepository, 
-            PaymentMethodRepository paymentMethodRepository
+            PaymentMethodRepository paymentMethodRepository,
+            UserRepository userRepository
         )
         {
             _connectionString = configuration.GetConnectionString("Default");
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _paymentMethodRepository = paymentMethodRepository;
+            _userRepository = userRepository;
         }
 
         public List<MenuInvoiceDTO> GetInvoiceAll(int userId)
@@ -162,6 +165,12 @@ namespace FinalProjectCodingIDBE.Repositories
             }
 
             conn.Close();
+
+            foreach (var item in invoiceList)
+            {
+                item.userData = _userRepository.GetByUserIdInvoice(item.Id);
+            }
+
             return invoiceList;
         }
 

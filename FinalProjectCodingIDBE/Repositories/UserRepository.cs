@@ -90,6 +90,7 @@ namespace FinalProjectCodingIDBE.Repositories
             return user;
         }
 
+
         public string CreateAccount(RegisterDto data, string verificationToken)
         {
             string response = string.Empty;
@@ -379,6 +380,40 @@ namespace FinalProjectCodingIDBE.Repositories
 
             conn.Close();
             return userResponseDTO;
+        }
+        public UserResponseDTO? GetByUserIdInvoice(int Id)
+        {
+            UserResponseDTO? user = null;
+
+            //get connection to database
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+                // able to query after open
+                // Perform database operations
+                MySqlCommand cmd = new MySqlCommand("SELECT user_id, user_email, role_user, user_name FROM users WHERE user_id=@Id", conn);
+                cmd.Parameters.AddWithValue("@Id", Id);
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    user = new UserResponseDTO();
+                    user.Id = reader.GetInt32("user_id");
+                    user.Email = reader.GetString("user_email");
+                    user.Role = reader.GetString("role_user");
+                    user.Name = reader.GetString("user_name");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            //required
+            conn.Close();
+
+            return user;
         }
 
         public string CreateAccountAdmin(AddUserAdminDTO data)
