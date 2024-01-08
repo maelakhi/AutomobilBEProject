@@ -17,6 +17,15 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _CategorysRepository.GetCategories();
         }
+        public Category GetByIdCategoryUser(int Id)
+        {
+            Category category = _CategorysRepository.GetCategoryById(Id);
+            return category;
+        }
+        public List<Category> GetCategoriesUser()
+        {
+            return _CategorysRepository.GetCategoriesUser();
+        }
 
         public Category GetByIdCategory(int Id)
         {
@@ -39,11 +48,11 @@ namespace FinalProjectCodingIDBE.Services
             return category;
         }
 
-        public List<Category> GetCategoryLimit()
+/*        public List<Category> GetCategoryLimit()
         {
             return _CategorysRepository.GetCategoryLimit();
         }
-
+*/
         public string CategoryStatus(int Id, bool Status)
         {
             string category = _CategorysRepository.UpdateStatusCategory(Id, Status);

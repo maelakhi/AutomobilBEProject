@@ -18,9 +18,9 @@ namespace FinalProjectCodingIDBE.Services
             return products;
         }
 
-        public List<ProductsResponseDTO> GetAllProductsActived()
+        public List<ProductsResponseDTO> GetAllProductsAllUser()
         {
-            List<ProductsResponseDTO> products = _productsRepository.GetAllProductsActived();
+            List<ProductsResponseDTO> products = _productsRepository.GetAllProductsAllUser();
             return products;
         }
 

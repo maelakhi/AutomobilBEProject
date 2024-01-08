@@ -51,7 +51,8 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return products;
         }
-        public List<ProductsResponseDTO> GetAllProductsActived()
+
+        public List<ProductsResponseDTO> GetAllProductsAllUser()
         {
             List<ProductsResponseDTO> products = new List<ProductsResponseDTO>();
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -59,7 +60,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false AND p.is_active = true;";
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false AND p.is_active = true ORDER BY created_at DESC;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -174,7 +175,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "INSERT INTO Products (product_id,product_name,product_desc,product_price,image_path,created_at,updated_at,id_category,is_active, is_delete) VALUES (@productId,@productName,@productDesc,@productPrice,@imagePath,@createdAt,@updatedAt,@isActive,@idCategory,@isDelete)";
+                string sql = "INSERT INTO Products (product_id,product_name,product_desc,product_price,image_path,created_at,updated_at,id_category,is_active, is_delete) VALUES (@productId,@productName,@productDesc,@productPrice,@imagePath,@createdAt,@updatedAt,@idCategory,@isActive,@isDelete)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@productId", null);
                 cmd.Parameters.AddWithValue("@productName", productsDTO.Name);
@@ -321,7 +322,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false LIMIT 8;";
+                string sql = "SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.is_delete = false AND p.is_active = true LIMIT 8;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -399,7 +400,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
 
-                string sql = $"SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.id_category IN (select cc.category_id from Category cc where cc.category_id = @idCategory) AND p.is_delete = false ;";
+                string sql = $"SELECT p.*,c.category_name FROM Products p LEFT JOIN Category c ON p.id_category = c.category_id WHERE p.id_category IN (select cc.category_id from Category cc where cc.category_id = @idCategory) AND p.is_delete = false AND p.is_active = true;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@idCategory", Id);
                 MySqlDataReader reader = cmd.ExecuteReader();

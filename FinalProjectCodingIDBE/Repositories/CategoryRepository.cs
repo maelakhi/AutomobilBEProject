@@ -49,6 +49,42 @@ namespace FinalProjectCodingIDBE.Repositories
             return category;
         }
 
+        public List<Category> GetCategoriesUser()
+        {
+            List<Category> category = new List<Category>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT * FROM Category WHERE is_active = true;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
+                    category.Add(new Category()
+                    {
+                        Id = reader.GetInt32("category_id"),
+                        Name = reader.GetString("category_name"),
+                        Description = reader.GetString("category_desc"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        ImagePath = image
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return category;
+        }
+
         public Category GetCategoryById(int Id)
         {
             Category category = new Category();
@@ -188,7 +224,7 @@ namespace FinalProjectCodingIDBE.Repositories
         }
 
 
-        public List<Category> GetCategoryLimit()
+ /*       public List<Category> GetCategoryLimit()
         {
             List<Category> category = new List<Category>();
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -221,7 +257,7 @@ namespace FinalProjectCodingIDBE.Repositories
 
             conn.Close();
             return category;
-        }
+        }*/
 
         public string UpdateStatusCategory(int Id, bool Status)
         {

@@ -24,6 +24,12 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpGet("/Category")]
+        public ActionResult GetAllUser()
+        {
+            return Ok(_CategoryService.GetCategoriesUser());
+        }
+
+        [HttpGet("/admin/Category")]
         public ActionResult GetAll()
         {
             return Ok(_CategoryService.GetCategories());
@@ -147,12 +153,12 @@ namespace FinalProjectCodingIDBE.Controllers
                }
            );
         }
-
+/*
         [HttpGet("/CategoryLimit")]
         public ActionResult GetCategoryLimit()
         {
             return Ok(_CategoryService.GetCategoryLimit());
-        }
+        }*/
 
         [Authorize(Roles = "admin")]
         [HttpPut("/category/Deactived")]

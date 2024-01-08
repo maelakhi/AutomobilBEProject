@@ -60,6 +60,30 @@ namespace FinalProjectCodingIDBE.Controllers
                     );
             }
 
+            if (user.IsVerified == false)
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Verified Your Account"
+                        }
+                    );
+            }
+
+            if (user.IsActive == false)
+            {
+                return StatusCode(
+                        (int)HttpStatusCode.Accepted,
+                        new
+                        {
+                            status = HttpStatusCode.Accepted,
+                            message = "Account is Inactive"
+                        }
+                    );
+            }
+
             //create token
             string token = JWTHelper.Generate(user.Id, user.Role);
 
