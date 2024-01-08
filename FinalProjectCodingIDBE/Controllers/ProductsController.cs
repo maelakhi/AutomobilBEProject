@@ -20,15 +20,15 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpGet("/products")]
+        public ActionResult GetAllUser()
+        {
+            return Ok(_productService.GetAllProductsAllUser());
+        }
+
+        [HttpGet("/admin/products")]
         public ActionResult GetAll()
         {
             return Ok(_productService.GetAllProducts());
-        }
-
-        [HttpGet("/productsActived")]
-        public ActionResult GetAllActived()
-        {
-            return Ok(_productService.GetAllProductsActived());
         }
 
         [HttpGet("/productsLimit")]

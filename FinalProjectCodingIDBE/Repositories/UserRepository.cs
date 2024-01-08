@@ -30,7 +30,7 @@ namespace FinalProjectCodingIDBE.Repositories
                 conn.Open();
                 // able to query after open
                 // Perform database operations
-                MySqlCommand cmd = new MySqlCommand("SELECT user_id, user_email, role_user FROM users WHERE user_email=@Email and user_password=@Password", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT user_id, user_email, role_user, is_verified, is_active FROM users WHERE user_email=@Email and user_password=@Password", conn);
                 cmd.Parameters.AddWithValue("@Email", data.Email);
                 cmd.Parameters.AddWithValue("@Password", data.Password);
 
@@ -41,6 +41,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     user.Id = reader.GetInt32("user_id");
                     user.Email = reader.GetString("user_email");
                     user.Role = reader.GetString("role_user");
+                    user.IsVerified = reader.GetBoolean("is_verified");
+                    user.IsActive = reader.GetBoolean("is_active");
                 }
             }
             catch (Exception ex)
