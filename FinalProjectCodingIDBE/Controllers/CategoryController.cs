@@ -62,11 +62,25 @@ namespace FinalProjectCodingIDBE.Controllers
 
             string res = _CategoryService.CategoryCreate(addCategoryDTO, fileUrlPath);
 
-            if (!string.IsNullOrEmpty(res))
+            if (string.IsNullOrEmpty(res) == false)
             {
-                return BadRequest(res);
+                return StatusCode(
+                     (int)HttpStatusCode.BadRequest,
+                     new
+                     {
+                         status = HttpStatusCode.BadRequest,
+                         message = res
+                     }
+                 );
             }
-            return Ok("Success Add Category");
+            return StatusCode(
+                  (int)HttpStatusCode.OK,
+                  new
+                  {
+                      status = HttpStatusCode.OK,
+                      message = "Success Add Category"
+                  }
+              );
         }
 
         [Authorize(Roles = "admin")]
