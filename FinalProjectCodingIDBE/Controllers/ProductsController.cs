@@ -108,7 +108,7 @@ namespace FinalProjectCodingIDBE.Controllers
                 using var stream = System.IO.File.OpenWrite(filePath);
                 await image.CopyToAsync(stream);
 
-                fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+                fileUrlPath = $"{uploadDir}/{fileName}";
 
                 string fileExistName = productExist.ImagePath.Replace("uploads/", "");
                 string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
