@@ -1,6 +1,8 @@
 ﻿using FinalProjectCodingIDBE.DTOs;
 using FinalProjectCodingIDBE.DTOs.InvoiceDTO;
 using FinalProjectCodingIDBE.DTOs.OrderDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
+using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
@@ -168,7 +170,8 @@ namespace FinalProjectCodingIDBE.Repositories
 
             foreach (var item in invoiceList)
             {
-                item.userData = _userRepository.GetByUserIdInvoice(item.Id);
+                UserResponseDTO? product = _userRepository.GetByUserIdInvoice(item.IdUser);
+                item.userData = product;
             }
 
             return invoiceList;
