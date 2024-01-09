@@ -6,7 +6,7 @@
         public int IdUser { get; set; }
         public int IdPayment { get; set; }
         public int TotalAmount { get; set; }
-        public string CreatedAt { get; set; } = string.Empty;
-        public string UpdatedAt { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } 
+        public DateTime UpdatedAt { get; set; } 
     }
 }

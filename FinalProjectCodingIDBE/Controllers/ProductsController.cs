@@ -1,5 +1,4 @@
 ﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
-using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +19,15 @@ namespace FinalProjectCodingIDBE.Controllers
         }
 
         [HttpGet("/products")]
+        public ActionResult GetAllUser()
+        {
+            return Ok(_productService.GetAllProductsAllUser());
+        }
+
+        [HttpGet("/admin/products")]
         public ActionResult GetAll()
         {
             return Ok(_productService.GetAllProducts());
-        }
-
-        [HttpGet("/productsActived")]
-        public ActionResult GetAllActived()
-        {
-            return Ok(_productService.GetAllProductsActived());
         }
 
         [HttpGet("/productsLimit")]
@@ -62,7 +61,7 @@ namespace FinalProjectCodingIDBE.Controllers
             using var stream = System.IO.File.OpenWrite(filePath);
             await image.CopyToAsync(stream);
 
-            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+            string fileUrlPath = $"{uploadDir}/{fileName}";
 
 
             string res = _productService.ProductCreate(addProductsDTO, fileUrlPath);
@@ -109,9 +108,9 @@ namespace FinalProjectCodingIDBE.Controllers
                 using var stream = System.IO.File.OpenWrite(filePath);
                 await image.CopyToAsync(stream);
 
-                fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+                fileUrlPath = $"{uploadDir}/{fileName}";
 
-                string fileExistName = productExist.ImagePath.Replace("https://localhost:7052/uploads/", "");
+                string fileExistName = productExist.ImagePath.Replace("uploads/", "");
                 string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
                 
                 // remove image from server

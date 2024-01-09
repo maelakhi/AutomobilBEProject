@@ -33,8 +33,44 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("category_id"),
                         Name = reader.GetString("category_name"),
                         Description = reader.GetString("category_desc"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        ImagePath = image
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+            return category;
+        }
+
+        public List<Category> GetCategoriesUser()
+        {
+            List<Category> category = new List<Category>();
+            MySqlConnection conn = new MySqlConnection(_connectionString);
+            try
+            {
+                conn.Open();
+
+                string sql = "SELECT * FROM Category WHERE is_active = true;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var image = reader.IsDBNull("image_path") ? string.Empty : reader.GetString("image_path");
+                    category.Add(new Category()
+                    {
+                        Id = reader.GetInt32("category_id"),
+                        Name = reader.GetString("category_name"),
+                        Description = reader.GetString("category_desc"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         IsActive = reader.GetBoolean("is_active"),
                         ImagePath = image
                     });
@@ -67,8 +103,8 @@ namespace FinalProjectCodingIDBE.Repositories
                     category.Id = reader.GetInt32("category_id");
                     category.Name = reader.GetString("category_name");
                     category.Description = reader.GetString("category_desc");
-                    category.CreatedAt = reader.GetString("created_at");
-                    category.UpdatedAt = reader.GetString("updated_at");
+                    category.CreatedAt = reader.GetDateTime("created_at");
+                    category.UpdatedAt = reader.GetDateTime("updated_at");
                     category.IsActive = reader.GetBoolean("is_active");
                     category.ImagePath = image;
                 }
@@ -113,7 +149,7 @@ namespace FinalProjectCodingIDBE.Repositories
             conn.Close();
             return response;
         }
-        public string UpdateCategory(int Id, AddCategoryDTO categoryDTO, string fileUrlPath)
+        public string UpdateCategory(int Id, EditCategoryDTO categoryDTO, string fileUrlPath)
         {
             string response = string.Empty;
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -188,7 +224,7 @@ namespace FinalProjectCodingIDBE.Repositories
         }
 
 
-        public List<Category> GetCategoryLimit()
+ /*       public List<Category> GetCategoryLimit()
         {
             List<Category> category = new List<Category>();
             MySqlConnection conn = new MySqlConnection(_connectionString);
@@ -208,8 +244,8 @@ namespace FinalProjectCodingIDBE.Repositories
                         Id = reader.GetInt32("category_id"),
                         Name = reader.GetString("category_name"),
                         Description = reader.GetString("category_desc"),
-                        CreatedAt = reader.GetString("created_at"),
-                        UpdatedAt = reader.GetString("updated_at"),
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at"),
                         ImagePath = image
                     });
                 }
@@ -221,7 +257,7 @@ namespace FinalProjectCodingIDBE.Repositories
 
             conn.Close();
             return category;
-        }
+        }*/
 
         public string UpdateStatusCategory(int Id, bool Status)
         {

@@ -17,6 +17,15 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _CategorysRepository.GetCategories();
         }
+        public Category GetByIdCategoryUser(int Id)
+        {
+            Category category = _CategorysRepository.GetCategoryById(Id);
+            return category;
+        }
+        public List<Category> GetCategoriesUser()
+        {
+            return _CategorysRepository.GetCategoriesUser();
+        }
 
         public Category GetByIdCategory(int Id)
         {
@@ -28,7 +37,7 @@ namespace FinalProjectCodingIDBE.Services
             string category = _CategorysRepository.CreateCategory(categorysDTO, fileUrlPath);
             return category;
         }
-        public string CategoryUpdate(int Id, AddCategoryDTO categorysDTO, string fileUrlPath)
+        public string CategoryUpdate(int Id, EditCategoryDTO categorysDTO, string fileUrlPath)
         {
             string category = _CategorysRepository.UpdateCategory(Id, categorysDTO, fileUrlPath);
             return category;
@@ -39,15 +48,15 @@ namespace FinalProjectCodingIDBE.Services
             return category;
         }
 
-        public List<Category> GetCategoryLimit()
+/*        public List<Category> GetCategoryLimit()
         {
             return _CategorysRepository.GetCategoryLimit();
         }
-
+*/
         public string CategoryStatus(int Id, bool Status)
         {
-            string product = _CategorysRepository.UpdateStatusCategory(Id, Status);
-            return product;
+            string category = _CategorysRepository.UpdateStatusCategory(Id, Status);
+            return category;
         }
 
     }

@@ -1,6 +1,8 @@
 ﻿using FinalProjectCodingIDBE.DTOs;
 using FinalProjectCodingIDBE.DTOs.InvoiceDTO;
 using FinalProjectCodingIDBE.DTOs.OrderDTO;
+using FinalProjectCodingIDBE.DTOs.ProductDTO;
+using FinalProjectCodingIDBE.DTOs.UsersDTO;
 using FinalProjectCodingIDBE.Models;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
@@ -14,17 +16,20 @@ namespace FinalProjectCodingIDBE.Repositories
         private readonly OrderRepository _orderRepository;
         private readonly ProductRepository _productRepository;
         private readonly PaymentMethodRepository _paymentMethodRepository;
+        private readonly UserRepository _userRepository;
         public InvoiceRepository(
             IConfiguration configuration, 
             OrderRepository orderRepository, 
             ProductRepository productRepository, 
-            PaymentMethodRepository paymentMethodRepository
+            PaymentMethodRepository paymentMethodRepository,
+            UserRepository userRepository
         )
         {
             _connectionString = configuration.GetConnectionString("Default");
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _paymentMethodRepository = paymentMethodRepository;
+            _userRepository = userRepository;
         }
 
         public List<MenuInvoiceDTO> GetInvoiceAll(int userId)
@@ -45,7 +50,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     invoiceList.Add(new MenuInvoiceDTO()
                     {
                         Id = reader.GetInt32("invoice_id"),
-                        createdAt = reader.GetString("created_at"),
+                        createdAt = reader.GetDateTime("created_at"),
                         totalCourse = reader.GetInt32("total_course"),
                         totalPrice = reader.GetInt32("total_price"),
                     });
@@ -78,7 +83,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     orders.Id = reader.GetInt32("invoice_id");
                     orders.IdUser = reader.GetInt32("id_user");
                     orders.TotalAmount = reader.GetInt32("total_amount");
-                    orders.CreatedAt = reader.GetString("created_at");
+                    orders.CreatedAt = reader.GetDateTime("created_at");
                 }
             }
             catch (Exception ex)
@@ -162,6 +167,13 @@ namespace FinalProjectCodingIDBE.Repositories
             }
 
             conn.Close();
+
+            foreach (var item in invoiceList)
+            {
+                UserResponseDTO? product = _userRepository.GetByUserIdInvoice(item.IdUser);
+                item.userData = product;
+            }
+
             return invoiceList;
         }
 
@@ -186,7 +198,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     orders.IdPayment = reader.GetInt32("id_payment");
                     orders.StatusPayment = reader.GetString("status_payment");
                     orders.TotalAmount = reader.GetInt32("total_amount");
-                    orders.CreatedAt = reader.GetString("created_at");
+                    orders.CreatedAt = reader.GetDateTime("created_at");
                 }                
             }
             catch (Exception ex)

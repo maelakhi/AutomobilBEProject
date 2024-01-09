@@ -8,7 +8,7 @@ namespace FinalProjectCodingIDBE.DTOs.InvoiceDTO
         public int Id { get; set; }
         public int IdUser { get; set; }
         public int TotalAmount { get; set; }
-        public string CreatedAt { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } 
         public List<OrderDetailsInvoice>? OrderDetails { get; set; }
     }
 }

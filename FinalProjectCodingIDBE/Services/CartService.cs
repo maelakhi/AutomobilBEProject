@@ -24,6 +24,12 @@ namespace FinalProjectCodingIDBE.Services
         {
             return _cartRepository.CreateCart(cartData);
         }
+
+        public string CartCreateBuyNow(AddCartDTO cartData)
+        {
+            return _cartRepository.CartCreateBuyNow(cartData);
+        }
+
         public string CartDelete(int idUser, int idCart)
         {
             return _cartRepository.DeleteCart(idUser, idCart);

@@ -10,7 +10,7 @@ namespace FinalProjectCodingIDBE.DTOs.InvoiceDTO
         public PaymentMethod? PaymentMethod { get; set; }
         public int TotalAmount { get; set; }
         public string StatusPayment { get; set; } = string.Empty;
-        public string CreatedAt { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } 
         public List<OrderDetailsInvoice>? OrderDetails { get; set; }
     }
 }
