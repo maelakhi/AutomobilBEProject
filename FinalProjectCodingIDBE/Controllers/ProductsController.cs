@@ -1,5 +1,4 @@
 ﻿using FinalProjectCodingIDBE.DTOs.ProductDTO;
-using FinalProjectCodingIDBE.Models;
 using FinalProjectCodingIDBE.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,7 +61,7 @@ namespace FinalProjectCodingIDBE.Controllers
             using var stream = System.IO.File.OpenWrite(filePath);
             await image.CopyToAsync(stream);
 
-            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+            string fileUrlPath = $"{uploadDir}/{fileName}";
 
 
             string res = _productService.ProductCreate(addProductsDTO, fileUrlPath);
@@ -111,7 +110,7 @@ namespace FinalProjectCodingIDBE.Controllers
 
                 fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
 
-                string fileExistName = productExist.ImagePath.Replace("https://localhost:7052/uploads/", "");
+                string fileExistName = productExist.ImagePath.Replace("uploads/", "");
                 string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
                 
                 // remove image from server

@@ -67,7 +67,7 @@ namespace FinalProjectCodingIDBE.Controllers
             var extName = Path.GetExtension(image.FileName).ToLowerInvariant(); //.jpg
 
             string fileName = Guid.NewGuid().ToString() + extName;
-            string uploadDir = "uploadsPaymentIcon";
+            string uploadDir = "uploads";
             string physicalPath = $"wwwroot/{uploadDir}";
 
             var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileName);
@@ -75,7 +75,7 @@ namespace FinalProjectCodingIDBE.Controllers
             using var stream = System.IO.File.OpenWrite(filePath);
             await image.CopyToAsync(stream);
 
-            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+            string fileUrlPath = $"{uploadDir}/{fileName}";
 
             string res = _paymentService.AddPayment(paymentDTO, fileUrlPath);
             if (string.IsNullOrEmpty(res) == false)
@@ -121,9 +121,9 @@ namespace FinalProjectCodingIDBE.Controllers
                 using var stream = System.IO.File.OpenWrite(filePath);
                 await image.CopyToAsync(stream);
 
-                fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+                fileUrlPath = $"{uploadDir}/{fileName}";
 
-                string fileExistName = paymentExist.ImagePath.Replace("https://localhost:7052/uploads/", "");
+                string fileExistName = paymentExist.ImagePath.Replace("uploads/", "");
                 string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
 
                 // remove image from server

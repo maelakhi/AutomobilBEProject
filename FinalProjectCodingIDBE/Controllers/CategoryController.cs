@@ -58,7 +58,7 @@ namespace FinalProjectCodingIDBE.Controllers
             using var stream = System.IO.File.OpenWrite(filePath);
             await image.CopyToAsync(stream);
 
-            string fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+            string fileUrlPath = $"{uploadDir}/{fileName}";
 
             string res = _CategoryService.CategoryCreate(addCategoryDTO, fileUrlPath);
 
@@ -90,9 +90,9 @@ namespace FinalProjectCodingIDBE.Controllers
                 using var stream = System.IO.File.OpenWrite(filePath);
                 await image.CopyToAsync(stream);
 
-                fileUrlPath = $"https://localhost:7052/{uploadDir}/{fileName}";
+                fileUrlPath = $"{uploadDir}/{fileName}";
 
-                string fileExistName = categoryExist.ImagePath.Replace("https://localhost:7052/uploads/", "");
+                string fileExistName = categoryExist.ImagePath.Replace("uploads/", "");
                 string imagePath = Path.Combine(_webHostEnvironment.ContentRootPath, physicalPath, fileExistName);
 
                 // remove image from server
