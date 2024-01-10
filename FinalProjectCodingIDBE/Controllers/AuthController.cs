@@ -164,7 +164,7 @@ namespace FinalProjectCodingIDBE.Controllers
 
             string htmlEmail = $@"
                                 Hello <b>{data.Email}</b>, please click link below to verify<br/>
-                                <a href='http://52.237.194.35:2030/confirmationEmail/{verificationToken}'>
+                                <a href='http://52.237.194.35:2029/confirmationEmail/{verificationToken}'>
                                     <button>Verify My Account</botton>
                                 </a>
                                 ";
