@@ -136,7 +136,7 @@ namespace FinalProjectCodingIDBE.Repositories
             {
                 conn.Open();
            
-                string sql = "SELECT user_id, user_email, verification_expired_token FROM Users WHERE verification_token = @vrToken ";
+                string sql = "SELECT user_id, user_email, role_user, verification_expired_token FROM Users WHERE verification_token = @vrToken ";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@vrToken", data.Token);
                 MySqlDataReader reader = cmd.ExecuteReader();
@@ -146,7 +146,7 @@ namespace FinalProjectCodingIDBE.Repositories
                     user = new Users();
                     user.Id = reader.GetInt32("user_id");
                     user.Email = reader.GetString("user_email");
-                    user.Role = reader.GetString("role_user");
+               /*     user.Role = reader.GetString("role_user");*/
                     user.VerificationExpiredToken = reader.GetDateTime("verification_expired_token");
                 }
             }
